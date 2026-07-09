@@ -46,7 +46,13 @@ const categories = getCategories(recipes);
       {recipes.map((recipe) => <RecipeCard recipe={recipe} />)}
     </div>
 
-    <p class="empty" id="empty" hidden>No recipes match your search.</p>
+    <p class="empty" id="empty" hidden={recipes.length > 0}>
+      {
+        recipes.length === 0
+          ? 'No recipes yet — add your first one.'
+          : 'No recipes match your search.'
+      }
+    </p>
   </main>
 </Base>
 
