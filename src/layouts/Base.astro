@@ -1,14 +1,24 @@
 ---
 import '../styles/global.css';
 import PullToRefresh from '../components/PullToRefresh.astro';
+import { t } from '../i18n/ui';
+import type { Locale } from '../i18n/config';
 
 interface Props {
   title: string;
+  locale: Locale;
   description?: string;
+  /** Equivalent URLs in the other locales, for hreflang alternates. */
+  alternates?: { locale: Locale; url: string }[];
 }
 
-const SITE_NAME = "Rodrigo's Kitchen";
-const { title, description = 'A personal recipe collection.' } = Astro.props;
+const {
+  title,
+  locale,
+  description = 'A personal recipe collection.',
+  alternates = [],
+} = Astro.props;
+const siteName = t(locale).siteName;
 const asset = (path: string) =>
   `${import.meta.env.BASE_URL}/${path}`.replace(/\/{2,}/g, '/');
 const favicon = asset('favicon.svg');
@@ -17,22 +27,36 @@ const appleTouchIcon = asset('apple-touch-icon.png');
 ---
 
 <!doctype html>
-<html lang="en">
+<html lang={locale}>
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="description" content={description} />
     <meta name="theme-color" content="#000000" />
-    <title>{`${title} · ${SITE_NAME}`}</title>
+    <title>{`${title} · ${siteName}`}</title>
     <link rel="icon" type="image/svg+xml" href={favicon} />
     <link rel="manifest" href={manifest} />
     <link rel="apple-touch-icon" href={appleTouchIcon} />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black" />
-    <meta name="apple-mobile-web-app-title" content={SITE_NAME} />
+    <meta name="apple-mobile-web-app-title" content={siteName} />
+    {
+      alternates.map((alt) => (
+        <link rel="alternate" hreflang={alt.locale} href={alt.url} />
+      ))
+    }
   </head>
   <body>
     <PullToRefresh />
     <slot />
+    <script is:inline define:vars={{ locale }}>
+      // Remember the language the visitor is actually viewing so the root
+      // redirect can return them here next time.
+      try {
+        localStorage.setItem('recipes:lang', locale);
+      } catch {
+        /* storage blocked — detection falls back to navigator.language */
+      }
+    </script>
   </body>
 </html>

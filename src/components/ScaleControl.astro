@@ -1,23 +1,27 @@
 ---
 import { Icon } from 'astro-icon/components';
 import type { Ingredient } from '../lib/types';
+import { t } from '../i18n/ui';
+import type { Locale } from '../i18n/config';
 
 interface Props {
   ingredients: Ingredient[];
   servings: number;
+  locale: Locale;
 }
 
-const { ingredients, servings } = Astro.props;
+const { ingredients, servings, locale } = Astro.props;
+const s = t(locale);
 // Only ingredients with a numeric amount can be used as a scaling basis.
 const scalable = ingredients.filter((i) => i.amount !== undefined);
 ---
 
 <div class="scale-panel" id="scale-panel" hidden>
-  <div class="segmented" role="tablist" aria-label="Scaling mode">
-    <button type="button" role="tab" class="seg is-active" data-scale-mode="amount">amount</button>
-    <button type="button" role="tab" class="seg" data-scale-mode="serving">serving</button>
+  <div class="segmented" role="tablist" aria-label={s.scalingModeAriaLabel}>
+    <button type="button" role="tab" class="seg is-active" data-scale-mode="amount">{s.modeAmount}</button>
+    <button type="button" role="tab" class="seg" data-scale-mode="serving">{s.modeServing}</button>
     {scalable.length > 0 && (
-      <button type="button" role="tab" class="seg" data-scale-mode="ingredient">ingredient</button>
+      <button type="button" role="tab" class="seg" data-scale-mode="ingredient">{s.modeIngredient}</button>
     )}
   </div>
 
@@ -31,14 +35,14 @@ const scalable = ingredients.filter((i) => i.amount !== undefined);
         step="0.25"
         value="1"
         data-base-servings={servings}
-        aria-label="Scale"
+        aria-label={s.scaleAriaLabel}
       />
     </div>
 
     <!-- ingredient mode: pick which ingredient to scale by -->
     <button type="button" class="select-btn" id="scale-select" hidden>
       <Icon name="lucide:carrot" size={18} />
-      <span id="scale-select-label">Select</span>
+      <span id="scale-select-label">{s.select}</span>
     </button>
 
     <!-- editable value (type instead of / alongside the slider) -->
@@ -51,15 +55,15 @@ const scalable = ingredients.filter((i) => i.amount !== undefined);
         step="any"
         inputmode="decimal"
         value="1"
-        aria-label="Scale value"
+        aria-label={s.scaleValueAriaLabel}
       />
       <span class="affix suffix" id="scale-suffix"></span>
     </div>
   </div>
 
-  <p class="hint" id="scale-hint" hidden>Tap an ingredient below to scale by it.</p>
+  <p class="hint" id="scale-hint" hidden>{s.scaleHint}</p>
 
-  <button type="button" class="reset" data-scale-reset>Reset to original</button>
+  <button type="button" class="reset" data-scale-reset>{s.resetToOriginal}</button>
 </div>
 
 <style>

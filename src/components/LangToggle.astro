@@ -1,0 +1,89 @@
+---
+import { LOCALES, LOCALE_LABELS, type Locale } from '../i18n/config';
+import { t } from '../i18n/ui';
+import { localeHref } from '../lib/url';
+
+interface Props {
+  /** The locale currently being viewed. */
+  locale: Locale;
+  /** Shared recipe key for a recipe page, or '' to link to each locale's home. */
+  path?: string;
+  /** Visual style: 'bar' on a solid page, 'overlay' floating over an image. */
+  variant?: 'bar' | 'overlay';
+}
+
+const { locale, path = '', variant = 'bar' } = Astro.props;
+const strings = t(locale);
+---
+
+<div
+  class:list={['lang', variant]}
+  role="group"
+  aria-label={strings.chooseLanguage}
+  data-lang-toggle
+>
+  {
+    LOCALES.map((l) => (
+      <a
+        class:list={['opt', { 'is-active': l === locale }]}
+        href={localeHref(l, path)}
+        data-locale={l}
+        aria-current={l === locale ? 'true' : undefined}
+        hreflang={l}
+      >
+        {LOCALE_LABELS[l]}
+      </a>
+    ))
+  }
+</div>
+
+<script>
+  // Persist the chosen language immediately on click; the destination page
+  // also records it on load, so this just makes the choice stick even if the
+  // user navigates away before load completes.
+  document
+    .querySelector('[data-lang-toggle]')
+    ?.addEventListener('click', (e) => {
+      const opt = (e.target as HTMLElement).closest<HTMLElement>('[data-locale]');
+      if (!opt) return;
+      try {
+        localStorage.setItem('recipes:lang', opt.dataset.locale ?? '');
+      } catch {
+        /* storage blocked — navigation still proceeds */
+      }
+    });
+</script>
+
+<style>
+  .lang {
+    display: inline-flex;
+    gap: 2px;
+    padding: 3px;
+    border-radius: var(--radius-pill);
+  }
+  .bar {
+    background: var(--surface);
+  }
+  .overlay {
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(6px);
+  }
+  .opt {
+    min-width: 34px;
+    padding: 7px 12px;
+    border-radius: var(--radius-pill);
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--fg);
+    text-align: center;
+    text-decoration: none;
+    line-height: 1;
+  }
+  .overlay .opt {
+    color: #fff;
+  }
+  .opt.is-active {
+    background: var(--accent);
+    color: #fff;
+  }
+</style>

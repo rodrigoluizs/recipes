@@ -43,9 +43,22 @@ describe('formatDuration', () => {
   });
 });
 
+describe('formatDuration with localized labels', () => {
+  const pt = { hr: 'h', min: 'min' };
+  it('uses the provided unit labels', () => {
+    expect(formatDuration(70, pt)).toBe('1 h 10 min');
+    expect(formatDuration(0, pt)).toBe('0 min');
+  });
+});
+
 describe('totalTime', () => {
   it('sums when both parse', () => {
     expect(totalTime('40 min', '30 min')).toBe('1 hr 10 min');
+  });
+  it('applies localized labels to the sum', () => {
+    expect(totalTime('40 min', '30 min', { hr: 'h', min: 'min' })).toBe(
+      '1 h 10 min',
+    );
   });
   it('falls back to joining raw strings when one is unparseable', () => {
     expect(totalTime('overnight', '30 min')).toBe('overnight + 30 min');

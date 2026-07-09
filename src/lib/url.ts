@@ -7,3 +7,11 @@ export function href(path = ''): string {
   const rel = path.startsWith('/') ? path : `/${path}`;
   return `${base}${rel}`;
 }
+
+/**
+ * Build a URL scoped to a locale: `localeHref('pt', 'desserts/flan')` ->
+ * "/recipes/pt/desserts/flan". With no path it points at the locale's home.
+ */
+export function localeHref(locale: string, path = ''): string {
+  return href(path ? `${locale}/${path}` : `${locale}`);
+}

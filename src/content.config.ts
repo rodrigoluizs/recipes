@@ -3,15 +3,17 @@ import { z } from 'astro/zod';
 import { glob } from 'astro/loaders';
 
 /**
- * Recipes live as `recipes/<category>/<slug>/index.md`. The entry id is the
- * folder path (e.g. "desserts/chocolate-brownie"), which doubles as the URL
- * slug and encodes the category as its first segment.
+ * Recipes live as `recipes/<category>/<slug>/<locale>.md` (e.g.
+ * `desserts/chocolate-brownie/en.md`). The entry id is the path without the
+ * extension (e.g. "desserts/chocolate-brownie/en"): its first segment is the
+ * category, the last is the locale, and the middle is the shared recipe key
+ * that doubles as the URL slug.
  */
 const recipes = defineCollection({
   loader: glob({
-    pattern: '**/index.md',
+    pattern: '**/*.md',
     base: './recipes',
-    generateId: ({ entry }) => entry.replace(/\/index\.md$/, ''),
+    generateId: ({ entry }) => entry.replace(/\.md$/, ''),
   }),
   schema: ({ image }) =>
     z.object({

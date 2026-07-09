@@ -1,15 +1,19 @@
 ---
 import { Icon } from 'astro-icon/components';
 import { totalTime } from '../lib/duration';
+import { t } from '../i18n/ui';
+import type { Locale } from '../i18n/config';
 
 interface Props {
   servings: number;
   prepTime: string;
   cookTime: string;
+  locale: Locale;
 }
 
-const { servings, prepTime, cookTime } = Astro.props;
-const total = totalTime(prepTime, cookTime);
+const { servings, prepTime, cookTime, locale } = Astro.props;
+const s = t(locale);
+const total = totalTime(prepTime, cookTime, { hr: s.durHr, min: s.durMin });
 ---
 
 <div class="meta">
@@ -20,16 +24,16 @@ const total = totalTime(prepTime, cookTime);
   <div class="pill times">
     <span class="t">
       <Icon name="lucide:clock" size={16} />
-      <span class="muted">Prep</span> {prepTime}
+      <span class="muted">{s.prep}</span> {prepTime}
     </span>
     <span class="sep" aria-hidden="true"></span>
     <span class="t">
       <Icon name="lucide:flame" size={16} />
-      <span class="muted">Cook</span> {cookTime}
+      <span class="muted">{s.cook}</span> {cookTime}
     </span>
   </div>
-  <div class="pill total" title="Total time">
-    <span class="muted">Total</span> {total}
+  <div class="pill total" title={s.totalTitle}>
+    <span class="muted">{s.total}</span> {total}
   </div>
 </div>
 
