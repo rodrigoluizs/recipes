@@ -48,24 +48,39 @@ export function parseDuration(input: string | null | undefined): number | null {
   return matched ? Math.round(total) : null;
 }
 
+/** Unit labels used when formatting a duration; defaults to English. */
+export interface DurationLabels {
+  hr: string;
+  min: string;
+}
+
+const DEFAULT_LABELS: DurationLabels = { hr: 'hr', min: 'min' };
+
 /** Format whole minutes as a human string, e.g. 70 -> "1 hr 10 min". */
-export function formatDuration(min: number): string {
-  if (!Number.isFinite(min) || min <= 0) return '0 min';
+export function formatDuration(
+  min: number,
+  labels: DurationLabels = DEFAULT_LABELS,
+): string {
+  if (!Number.isFinite(min) || min <= 0) return `0 ${labels.min}`;
   const h = Math.floor(min / 60);
   const m = Math.round(min % 60);
   const parts: string[] = [];
-  if (h) parts.push(`${h} hr`);
-  if (m) parts.push(`${m} min`);
-  return parts.join(' ') || '0 min';
+  if (h) parts.push(`${h} ${labels.hr}`);
+  if (m) parts.push(`${m} ${labels.min}`);
+  return parts.join(' ') || `0 ${labels.min}`;
 }
 
 /**
  * Total time from prep + cook. When both parse, returns a formatted sum;
  * otherwise falls back to joining the raw strings.
  */
-export function totalTime(prep: string, cook: string): string {
+export function totalTime(
+  prep: string,
+  cook: string,
+  labels: DurationLabels = DEFAULT_LABELS,
+): string {
   const p = parseDuration(prep);
   const c = parseDuration(cook);
-  if (p !== null && c !== null) return formatDuration(p + c);
+  if (p !== null && c !== null) return formatDuration(p + c, labels);
   return [prep, cook].filter(Boolean).join(' + ');
 }

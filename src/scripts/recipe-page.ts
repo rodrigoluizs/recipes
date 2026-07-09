@@ -7,10 +7,21 @@ interface ClientIngredient {
   note?: string;
 }
 
+/** Runtime UI strings passed from the server for the current locale. */
+interface ClientStrings {
+  servings: string;
+  select: string;
+  /** Template with {n}/{m} placeholders, e.g. "Step {n} of {m}". */
+  stepOf: string;
+  next: string;
+  done: string;
+}
+
 interface RecipeClientData {
   baseServings: number;
   /** Keyed by lowercased ingredient name. */
   ingredients: Record<string, ClientIngredient>;
+  t: ClientStrings;
 }
 
 type Mode = 'amount' | 'serving' | 'ingredient';
@@ -30,6 +41,7 @@ function clamp(n: number): number {
 
 function init(data: RecipeClientData): void {
   const { baseServings } = data;
+  const strings = data.t;
   let factor = 1;
   let mode: Mode = 'amount';
   let selectedName: string | null = null;
@@ -82,15 +94,15 @@ function init(data: RecipeClientData): void {
     if (suffix) {
       suffix.textContent =
         mode === 'serving'
-          ? 'servings'
+          ? strings.servings
           : mode === 'ingredient' && selectedName
             ? (data.ingredients[selectedName]?.unit ?? '')
             : '';
     }
     if (selectLabel) {
       selectLabel.textContent = selectedName
-        ? (data.ingredients[selectedName]?.name ?? 'Select')
-        : 'Select';
+        ? (data.ingredients[selectedName]?.name ?? strings.select)
+        : strings.select;
     }
   }
 
@@ -227,7 +239,7 @@ function init(data: RecipeClientData): void {
   window.addEventListener('scroll', hidePopover, { passive: true });
 
   // --- Cook mode ----------------------------------------------------------
-  setupCookMode(hidePopover);
+  setupCookMode(hidePopover, strings);
 
   // --- Initial state ------------------------------------------------------
   setMode('amount');
@@ -237,7 +249,7 @@ function init(data: RecipeClientData): void {
   applyScale(!Number.isNaN(initial) && initial > 0 ? initial / baseServings : 1);
 }
 
-function setupCookMode(hidePopover: () => void): void {
+function setupCookMode(hidePopover: () => void, strings: ClientStrings): void {
   const overlay = document.getElementById('cook-mode');
   const stepEl = overlay?.querySelector<HTMLElement>('[data-cook-step]');
   const progress = overlay?.querySelector<HTMLElement>('[data-cook-progress]');
@@ -258,9 +270,12 @@ function setupCookMode(hidePopover: () => void): void {
   function render(): void {
     hidePopover(); // clear any ingredient tooltip from the previous step
     stepEl!.innerHTML = stepBodies[index];
-    progress!.textContent = `Step ${index + 1} of ${stepBodies.length}`;
+    progress!.textContent = strings.stepOf
+      .replace('{n}', String(index + 1))
+      .replace('{m}', String(stepBodies.length));
     prevBtn!.disabled = index === 0;
-    nextBtn!.textContent = index === stepBodies.length - 1 ? 'Done' : 'Next';
+    nextBtn!.textContent =
+      index === stepBodies.length - 1 ? strings.done : strings.next;
   }
   function next(): void {
     if (index < stepBodies.length - 1) {

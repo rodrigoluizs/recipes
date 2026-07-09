@@ -1,0 +1,179 @@
+---
+import { Icon } from 'astro-icon/components';
+import Base from '../../layouts/Base.astro';
+import RecipeCard from '../../components/RecipeCard.astro';
+import LangToggle from '../../components/LangToggle.astro';
+import { getRecipesByLocale, getCategories } from '../../lib/recipes';
+import { t, categoryLabel } from '../../i18n/ui';
+import { LOCALES, type Locale } from '../../i18n/config';
+import { localeHref } from '../../lib/url';
+
+export async function getStaticPaths() {
+  return LOCALES.map((locale) => ({ params: { locale } }));
+}
+
+const locale = Astro.params.locale as Locale;
+const s = t(locale);
+const recipes = await getRecipesByLocale(locale);
+const categories = getCategories(recipes);
+
+const alternates = LOCALES.map((l) => ({
+  locale: l,
+  url: new URL(localeHref(l), Astro.site).href,
+}));
+---
+
+<Base title={s.allRecipes} locale={locale} alternates={alternates}>
+  <main class="container">
+    <div class="head">
+      <h1>{s.allRecipes}</h1>
+      <LangToggle locale={locale} variant="bar" />
+    </div>
+
+    <div class="search">
+      <Icon name="lucide:search" size={20} />
+      <input
+        id="search"
+        type="search"
+        placeholder={s.searchPlaceholder}
+        aria-label={s.searchPlaceholder}
+        autocomplete="off"
+      />
+    </div>
+
+    {
+      categories.length > 1 && (
+        <div class="chips" role="group" aria-label={s.allRecipes}>
+          <button class="pill is-active" data-category="" type="button">
+            {s.filterAll}
+          </button>
+          {categories.map((c) => (
+            <button class="pill" data-category={c} type="button">
+              {categoryLabel(c, locale)}
+            </button>
+          ))}
+        </div>
+      )
+    }
+
+    <div class="grid" id="grid">
+      {recipes.map((recipe) => <RecipeCard recipe={recipe} locale={locale} />)}
+    </div>
+
+    <p class="empty" id="empty" hidden={recipes.length > 0}>
+      {recipes.length === 0 ? s.noRecipesYet : s.noRecipesMatch}
+    </p>
+  </main>
+</Base>
+
+<style>
+  .head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+  }
+  .head h1 {
+    margin: 0;
+  }
+  .search {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 0 18px;
+    height: 52px;
+    border-radius: var(--radius-pill);
+    background: var(--surface);
+    color: var(--muted);
+    margin: 20px 0;
+  }
+  .search input {
+    flex: 1;
+    border: 0;
+    background: transparent;
+    color: var(--fg);
+    font-size: 1.05rem;
+    outline: none;
+  }
+  .search input::placeholder {
+    color: var(--muted);
+  }
+  .chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 22px;
+  }
+  .pill {
+    border: 0;
+    padding: 8px 16px;
+    border-radius: var(--radius-pill);
+    background: var(--surface);
+    color: var(--fg);
+    font-size: 0.95rem;
+    font-weight: 600;
+  }
+  .pill.is-active {
+    background: var(--accent);
+    color: #fff;
+  }
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--gap);
+  }
+  .empty {
+    color: var(--muted);
+    text-align: center;
+    padding: 40px 0;
+  }
+  @media (max-width: 600px) {
+    .grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
+
+<script>
+  const input = document.getElementById('search') as HTMLInputElement | null;
+  const cards = Array.from(
+    document.querySelectorAll<HTMLElement>('[data-recipe-card]'),
+  );
+  const chips = Array.from(
+    document.querySelectorAll<HTMLButtonElement>('.pill'),
+  );
+  const empty = document.getElementById('empty');
+
+  let query = '';
+  let category = '';
+
+  function apply() {
+    let visible = 0;
+    for (const card of cards) {
+      const haystack = [
+        card.dataset.title,
+        card.dataset.tags,
+        card.dataset.ingredients,
+      ].join(' ');
+      const matchesQuery = !query || haystack.includes(query);
+      const matchesCategory = !category || card.dataset.category === category;
+      const show = matchesQuery && matchesCategory;
+      card.hidden = !show;
+      if (show) visible++;
+    }
+    if (empty) empty.hidden = visible !== 0;
+  }
+
+  input?.addEventListener('input', () => {
+    query = input.value.trim().toLowerCase();
+    apply();
+  });
+
+  for (const chip of chips) {
+    chip.addEventListener('click', () => {
+      category = chip.dataset.category ?? '';
+      for (const c of chips) c.classList.toggle('is-active', c === chip);
+      apply();
+    });
+  }
+</script>

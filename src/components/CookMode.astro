@@ -2,12 +2,21 @@
 // Full-screen step-by-step overlay. Steps are cloned from the rendered
 // MethodSteps list by the client controller so ingredient references stay
 // identical (highlight + tap-for-quantity). Markup starts hidden.
+import { t } from '../i18n/ui';
+import type { Locale } from '../i18n/config';
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const s = t(locale);
 ---
 
-<div class="cook" id="cook-mode" hidden aria-modal="true" role="dialog" aria-label="Cook mode">
+<div class="cook" id="cook-mode" hidden aria-modal="true" role="dialog" aria-label={s.cookModeLabel}>
   <header class="bar">
-    <button type="button" class="exit" data-cook-exit aria-label="Exit cook mode">✕</button>
-    <span class="progress" data-cook-progress>Step 1</span>
+    <button type="button" class="exit" data-cook-exit aria-label={s.exitCookMode}>✕</button>
+    <span class="progress" data-cook-progress></span>
     <span class="spacer"></span>
   </header>
 
@@ -16,8 +25,8 @@
   </div>
 
   <footer class="nav">
-    <button type="button" class="nav-btn" data-cook-prev>Previous</button>
-    <button type="button" class="nav-btn primary" data-cook-next>Next</button>
+    <button type="button" class="nav-btn" data-cook-prev>{s.previous}</button>
+    <button type="button" class="nav-btn primary" data-cook-next>{s.next}</button>
   </footer>
 </div>
 

@@ -5,21 +5,28 @@ description: Create a new recipe in this repository with the correct structure, 
 
 # New Recipe
 
-Author a new recipe as a structured Markdown file and let the user preview it
-live before any commit/PR.
+Author a new recipe as structured Markdown — in **both English and Portuguese** —
+and let the user preview it live before any commit/PR.
 
 ## Rules
 
-- All recipe content is written in **English**.
-- Every recipe MUST have: `title`, `servings`, `prepTime`, `cookTime`,
+- Every recipe exists in **both languages**: `en.md` and `pt.md`, side by side
+  in the recipe folder. Validation (`npm run validate`) fails if either is
+  missing.
+- Author one language with the user (their choice), then translate it into the
+  other; show the user the translation for review. Keep numbers and units
+  identical across languages — only the human-readable text changes.
+- Every recipe file MUST have: `title`, `servings`, `prepTime`, `cookTime`,
   `ingredients` (>= 1), `method` (>= 1).
 - Ingredients are structured: `{ amount?, unit?, name, note? }`.
   - `amount` is a number; omit it for non-scalable items ("to taste").
   - `unit` is optional ("g", "ml", "tsp"); omit for countable items (eggs).
   - `note` is a muted clarifier shown after the name ("grated", "to taste").
 - In `method` steps, reference an ingredient with `[[name]]` where `name`
-  matches an ingredient's `name` exactly (case-insensitive). These render
-  highlighted and tappable to show the (scaled) quantity.
+  matches an ingredient's `name` exactly (case-insensitive) **in that same
+  file**. Since ingredient names are translated, the `[[refs]]` in `pt.md` must
+  match the Portuguese names, and those in `en.md` the English names. These
+  render highlighted and tappable to show the (scaled) quantity.
 - A step containing `: ` (colon + space) must be wrapped in quotes in YAML.
 
 ## Steps
@@ -31,33 +38,44 @@ live before any commit/PR.
    - Method steps. Offer to add `[[name]]` references for ingredients used.
    - Optional: photo, source URL (`sourceUrl`), tags, nutrition, body notes.
 
-2. **Derive the slug** from the title: lowercase, spaces → `-`, strip anything
-   that is not `a-z0-9-`. Example: "Chocolate Brownie" → `chocolate-brownie`.
+2. **Derive the slug** from the **English** title (language-neutral, shared by
+   both files): lowercase, spaces → `-`, strip anything that is not `a-z0-9-`.
+   Example: "Chocolate Brownie" → `chocolate-brownie`. The folder is
+   `recipes/<category>/<slug>/`.
 
-3. **Write** the file to `recipes/<category>/<slug>/index.md` using the template
-   below. If the user has a photo, save it in the same folder and set
-   `image: ./<filename>`; otherwise omit `image` (a gradient fallback is used).
+3. **Write both files** into `recipes/<category>/<slug>/`:
+   - `en.md` — the English version.
+   - `pt.md` — the Portuguese version (translate title, ingredient names/notes,
+     method, tags, and body; keep amounts/units the same; re-point every
+     `[[ref]]` at the Portuguese ingredient names).
+   Use the template below for each. If the user has a photo, save it once in the
+   folder and set `image: ./<filename>` in both files; otherwise omit `image`
+   (a gradient fallback is used). The photo is shared across languages.
 
-4. **Validate**: run `npm run validate`. Fix any schema errors (missing required
-   fields, wrong types) before continuing. Also confirm no build warning about
-   unmatched `[[name]]` references (the names must match ingredients).
+4. **Validate**: run `npm run validate`. This type-checks both files and fails if
+   either language is missing. Fix any schema errors (missing required fields,
+   wrong types) before continuing. Also confirm no build warning about unmatched
+   `[[name]]` references (each file's names must match its own ingredients).
 
 5. **Preview**: start the dev server in the background and open the browser to
-   the new recipe:
+   the new recipe in both languages:
 
    ```bash
    npm run dev &
    # wait for "http://localhost:4321" then:
-   open "http://localhost:4321/recipes/<category>/<slug>"
+   open "http://localhost:4321/recipes/en/<category>/<slug>"
+   open "http://localhost:4321/recipes/pt/<category>/<slug>"
    ```
 
-   Tell the user to review the recipe (check the card on the home page, the
-   ingredient list, method references, scaling, and Cook Mode).
+   Tell the user to review both languages (check the card on the home page, the
+   ingredient list, method references, scaling, Cook Mode, and the EN/PT toggle).
 
 6. **Wait for the user's confirmation.** Only after they are happy, offer to
    commit and open a PR (use the commit-and-pr flow; never commit to `main`).
 
 ## Template
+
+Use this for both `en.md` and `pt.md` (translated content, identical structure):
 
 ```markdown
 ---

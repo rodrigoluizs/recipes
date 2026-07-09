@@ -2,18 +2,22 @@
 import { Image } from 'astro:assets';
 import { Icon } from 'astro-icon/components';
 import type { RecipeEntry } from '../lib/recipes';
-import { categoryOf } from '../lib/recipes';
+import { categoryOf, recipeKeyOf } from '../lib/recipes';
 import { totalTime } from '../lib/duration';
-import { href } from '../lib/url';
+import { localeHref } from '../lib/url';
+import { t } from '../i18n/ui';
+import type { Locale } from '../i18n/config';
 
 interface Props {
   recipe: RecipeEntry;
+  locale: Locale;
 }
 
-const { recipe } = Astro.props;
+const { recipe, locale } = Astro.props;
 const { title, servings, prepTime, cookTime, image, tags } = recipe.data;
 const category = categoryOf(recipe.id);
-const time = totalTime(prepTime, cookTime);
+const s = t(locale);
+const time = totalTime(prepTime, cookTime, { hr: s.durHr, min: s.durMin });
 
 // Deterministic fallback gradient when there is no photo.
 const palettes = [
@@ -24,8 +28,9 @@ const palettes = [
   ['#870000', '#190a05'],
   ['#1f4037', '#99f2c8'],
 ];
+const key = recipeKeyOf(recipe.id);
 let hash = 0;
-for (const ch of recipe.id) hash = (hash * 31 + ch.charCodeAt(0)) >>> 0;
+for (const ch of key) hash = (hash * 31 + ch.charCodeAt(0)) >>> 0;
 const [c1, c2] = palettes[hash % palettes.length];
 
 // Lowercased haystacks for client-side search filtering.
@@ -39,7 +44,7 @@ const searchIngredients = recipe.data.ingredients
 
 <a
   class="card"
-  href={href(recipe.id)}
+  href={localeHref(locale, key)}
   data-recipe-card
   data-title={searchTitle}
   data-tags={searchTags}

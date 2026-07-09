@@ -1,27 +1,34 @@
 ---
 import { Image } from 'astro:assets';
+import { getCollection } from 'astro:content';
 import { render } from 'astro:content';
 import { Icon } from 'astro-icon/components';
-import Base from '../layouts/Base.astro';
-import RecipeMeta from '../components/RecipeMeta.astro';
-import IngredientList from '../components/IngredientList.astro';
-import MethodSteps from '../components/MethodSteps.astro';
-import ScaleControl from '../components/ScaleControl.astro';
-import CookMode from '../components/CookMode.astro';
-import { getAllRecipes } from '../lib/recipes';
-import { validateSteps } from '../lib/references';
-import { href } from '../lib/url';
+import Base from '../../layouts/Base.astro';
+import RecipeMeta from '../../components/RecipeMeta.astro';
+import IngredientList from '../../components/IngredientList.astro';
+import MethodSteps from '../../components/MethodSteps.astro';
+import ScaleControl from '../../components/ScaleControl.astro';
+import CookMode from '../../components/CookMode.astro';
+import LangToggle from '../../components/LangToggle.astro';
+import { localeOf, recipeKeyOf } from '../../lib/recipes';
+import { validateSteps } from '../../lib/references';
+import { localeHref } from '../../lib/url';
+import { t, format } from '../../i18n/ui';
+import { LOCALES, type Locale } from '../../i18n/config';
 
 export async function getStaticPaths() {
-  const recipes = await getAllRecipes();
+  const recipes = await getCollection('recipes');
   return recipes.map((recipe) => ({
-    params: { slug: recipe.id },
+    params: { locale: localeOf(recipe.id), slug: recipeKeyOf(recipe.id) },
     props: { recipe },
   }));
 }
 
 const { recipe } = Astro.props;
 const { data } = recipe;
+const locale = localeOf(recipe.id) as Locale;
+const key = recipeKeyOf(recipe.id);
+const s = t(locale);
 const { Content } = await render(recipe);
 
 // Warn (at build time) about ingredient references that don't resolve.
@@ -34,16 +41,28 @@ if (unmatched.length > 0) {
 
 const nutritionEntries = data.nutrition ? Object.entries(data.nutrition) : [];
 
+const alternates = LOCALES.map((l) => ({
+  locale: l,
+  url: new URL(localeHref(l, key), Astro.site).href,
+}));
+
 // Payload for the client controller (scaling + popovers).
 const clientData = {
   baseServings: data.servings,
   ingredients: Object.fromEntries(
     data.ingredients.map((i) => [i.name.toLowerCase(), i]),
   ),
+  t: {
+    servings: s.servings,
+    select: s.select,
+    stepOf: s.stepOf,
+    next: s.next,
+    done: s.done,
+  },
 };
 ---
 
-<Base title={data.title} description={`${data.title} recipe`}>
+<Base title={data.title} locale={locale} description={data.title} alternates={alternates}>
   <article>
     <div class="hero">
       {
@@ -53,19 +72,22 @@ const clientData = {
           <div class="hero-fallback"><span aria-hidden="true">🍽️</span></div>
         )
       }
-      <a class="round back" href={href('')} aria-label="Back to all recipes">
+      <a class="round back" href={localeHref(locale)} aria-label={s.backToRecipes}>
         <Icon name="lucide:chevron-left" size={24} />
       </a>
-      <button class="round share" type="button" data-share aria-label="Share recipe">
-        <Icon name="lucide:share" size={20} />
-      </button>
+      <div class="hero-actions">
+        <LangToggle locale={locale} path={key} variant="overlay" />
+        <button class="round share" type="button" data-share aria-label={s.shareRecipe}>
+          <Icon name="lucide:share" size={20} />
+        </button>
+      </div>
     </div>
 
     <div class="container">
       <div class="actions">
         <button class="start" type="button" data-cook-start>
           <Icon name="lucide:play" size={20} />
-          Start
+          {s.start}
         </button>
       </div>
 
@@ -75,27 +97,28 @@ const clientData = {
         servings={data.servings}
         prepTime={data.prepTime}
         cookTime={data.cookTime}
+        locale={locale}
       />
 
       <section>
         <div class="section-head">
-          <h2>Ingredients</h2>
-          <button class="scale-btn accent" type="button" data-scale-toggle>Scale</button>
+          <h2>{s.ingredients}</h2>
+          <button class="scale-btn accent" type="button" data-scale-toggle>{s.scale}</button>
         </div>
-        <ScaleControl ingredients={data.ingredients} servings={data.servings} />
+        <ScaleControl ingredients={data.ingredients} servings={data.servings} locale={locale} />
         <IngredientList ingredients={data.ingredients} />
       </section>
 
       <section>
-        <h2>Method</h2>
+        <h2>{s.method}</h2>
         <MethodSteps method={data.method} />
       </section>
 
       {
         nutritionEntries.length > 0 && (
           <section>
-            <h2>Nutrition</h2>
-            <p class="muted note">Per original serving ({data.servings} servings).</p>
+            <h2>{s.nutrition}</h2>
+            <p class="muted note">{format(s.nutritionNote, { n: data.servings })}</p>
             <ul class="nutrition">
               {nutritionEntries.map(([k, v]) => (
                 <li>
@@ -114,24 +137,25 @@ const clientData = {
 
       {data.sourceUrl && (
         <a class="source" href={data.sourceUrl} target="_blank" rel="noopener">
-          View original source ↗
+          {s.viewOriginalSource}
         </a>
       )}
     </div>
 
-    <CookMode />
+    <CookMode locale={locale} />
   </article>
 
   <script
     is:inline
     type="application/json"
     id="recipe-data"
+    data-copied={s.linkCopied}
     set:html={JSON.stringify(clientData)}
   />
 </Base>
 
 <script>
-  import '../scripts/recipe-page.ts';
+  import '../../scripts/recipe-page.ts';
 
   document.querySelector('[data-share]')?.addEventListener('click', async () => {
     const shareData = { title: document.title, url: location.href };
@@ -139,7 +163,10 @@ const clientData = {
       if (navigator.share) await navigator.share(shareData);
       else {
         await navigator.clipboard.writeText(location.href);
-        alert('Link copied to clipboard');
+        const msg = document
+          .getElementById('recipe-data')
+          ?.getAttribute('data-copied');
+        alert(msg || 'Link copied');
       }
     } catch {
       /* user cancelled — ignore */
@@ -189,8 +216,16 @@ const clientData = {
   .back {
     left: 16px;
   }
-  .share {
+  .hero-actions {
+    position: absolute;
+    top: 16px;
     right: 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .share {
+    position: static;
     font-size: 1rem;
   }
   .actions {

@@ -16,3 +16,6 @@ yarn-error.log*
 
 # macOS
 .DS_Store
+
+# design/spec docs (kept local, not versioned in this repo)
+docs/superpowers/
