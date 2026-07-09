@@ -1,0 +1,90 @@
+---
+import type { Ingredient } from '../lib/types';
+import { formatQuantity } from '../lib/quantity';
+
+interface Props {
+  ingredients: Ingredient[];
+}
+
+const { ingredients } = Astro.props;
+---
+
+<ul class="ingredients" role="list">
+  {
+    ingredients.map((ing) => (
+      <li>
+        <label class="row">
+          <input type="checkbox" class="tick" />
+          <span class="text">
+            {ing.amount !== undefined && (
+              <span
+                class="qty accent"
+                data-qty
+                data-amount={ing.amount}
+                data-unit={ing.unit ?? ''}
+              >
+                {formatQuantity(ing)}
+              </span>
+            )}
+            <span class="name">{ing.name}</span>
+            {ing.note && <span class="note muted">{ing.note}</span>}
+          </span>
+        </label>
+      </li>
+    ))
+  }
+</ul>
+
+<style>
+  .ingredients {
+    list-style: none;
+    margin: 0;
+    padding: 8px 4px;
+    background: var(--surface);
+    border-radius: var(--radius);
+  }
+  .row {
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+    padding: 10px 14px;
+    cursor: pointer;
+  }
+  .tick {
+    appearance: none;
+    width: 20px;
+    height: 20px;
+    border: 2px solid var(--muted);
+    border-radius: 6px;
+    flex: 0 0 auto;
+    align-self: center;
+    display: grid;
+    place-items: center;
+  }
+  .tick:checked {
+    background: var(--accent);
+    border-color: var(--accent);
+  }
+  .tick:checked::after {
+    content: '✓';
+    color: #fff;
+    font-size: 13px;
+    line-height: 1;
+  }
+  .text {
+    font-size: 1.1rem;
+  }
+  .qty {
+    font-weight: 700;
+    margin-right: 6px;
+  }
+  .note {
+    margin-left: 6px;
+    font-size: 0.95em;
+  }
+  .tick:checked ~ .name,
+  .row:has(.tick:checked) .text {
+    text-decoration: line-through;
+    color: var(--muted);
+  }
+</style>

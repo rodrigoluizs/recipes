@@ -1,0 +1,103 @@
+---
+// Full-screen step-by-step overlay. Steps are cloned from the rendered
+// MethodSteps list by the client controller so ingredient references stay
+// identical (highlight + tap-for-quantity). Markup starts hidden.
+---
+
+<div class="cook" id="cook-mode" hidden aria-modal="true" role="dialog" aria-label="Cook mode">
+  <header class="bar">
+    <button type="button" class="exit" data-cook-exit aria-label="Exit cook mode">✕</button>
+    <span class="progress" data-cook-progress>Step 1</span>
+    <span class="spacer"></span>
+  </header>
+
+  <div class="stage">
+    <p class="step-text" data-cook-step></p>
+  </div>
+
+  <footer class="nav">
+    <button type="button" class="nav-btn" data-cook-prev>Previous</button>
+    <button type="button" class="nav-btn primary" data-cook-next>Next</button>
+  </footer>
+</div>
+
+<style>
+  .cook {
+    position: fixed;
+    inset: 0;
+    z-index: 100;
+    background: var(--bg);
+    display: flex;
+    flex-direction: column;
+  }
+  .bar {
+    display: flex;
+    align-items: center;
+    padding: 16px 20px;
+  }
+  .exit {
+    border: 0;
+    background: var(--surface);
+    color: var(--fg);
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    font-size: 1.1rem;
+  }
+  .progress {
+    flex: 1;
+    text-align: center;
+    color: var(--muted);
+    font-weight: 600;
+  }
+  .spacer {
+    width: 40px;
+  }
+  .stage {
+    flex: 1;
+    display: grid;
+    place-items: center;
+    padding: 24px;
+    text-align: center;
+  }
+  .step-text {
+    margin: 0;
+    max-width: 20ch;
+    font-size: clamp(1.8rem, 6vw, 3rem);
+    font-weight: 700;
+    line-height: 1.25;
+  }
+  .nav {
+    display: flex;
+    gap: 12px;
+    padding: 20px;
+    padding-bottom: calc(20px + env(safe-area-inset-bottom));
+  }
+  .nav-btn {
+    flex: 1;
+    height: 56px;
+    border: 0;
+    border-radius: var(--radius);
+    background: var(--surface);
+    color: var(--fg);
+    font-size: 1.1rem;
+    font-weight: 700;
+  }
+  .nav-btn.primary {
+    background: var(--accent);
+    color: #fff;
+  }
+  .nav-btn:disabled {
+    opacity: 0.4;
+  }
+  /* Ingredient references inside cook mode reuse the accent styling. */
+  .step-text :global(.ref) {
+    border: 0;
+    background: none;
+    font: inherit;
+    font-weight: 700;
+    color: var(--accent);
+    cursor: pointer;
+    border-bottom: 2px dashed color-mix(in srgb, var(--accent) 55%, transparent);
+  }
+</style>
