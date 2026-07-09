@@ -1,0 +1,124 @@
+---
+// Pull-to-refresh for the iOS Home Screen web app.
+// iOS standalone web apps have no browser chrome and no native
+// pull-to-refresh, so we implement the gesture ourselves. It only activates
+// when the page is actually running standalone, leaving normal Safari untouched.
+---
+
+<div id="ptr" aria-hidden="true">
+  <div class="ptr-spinner"></div>
+</div>
+
+<style>
+  #ptr {
+    position: fixed;
+    top: 0;
+    left: 50%;
+    z-index: 1000;
+    display: grid;
+    place-items: center;
+    width: 40px;
+    height: 40px;
+    margin-left: -20px;
+    border-radius: 50%;
+    background: var(--surface-2, #1a1a1a);
+    box-shadow: 0 2px 8px rgb(0 0 0 / 0.4);
+    opacity: 0;
+    transform: translateY(-56px);
+    pointer-events: none;
+  }
+
+  .ptr-spinner {
+    width: 18px;
+    height: 18px;
+    border: 2px solid var(--muted, #666);
+    border-top-color: var(--accent, #2e9bff);
+    border-radius: 50%;
+  }
+
+  #ptr.refreshing {
+    opacity: 1 !important;
+    transform: translateY(16px) !important;
+    transition:
+      transform 0.2s ease,
+      opacity 0.2s ease;
+  }
+
+  #ptr.refreshing .ptr-spinner {
+    animation: ptr-spin 0.7s linear infinite;
+  }
+
+  @keyframes ptr-spin {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+</style>
+
+<script>
+  const isStandalone =
+    (window.navigator as any).standalone === true ||
+    window.matchMedia('(display-mode: standalone)').matches;
+
+  if (isStandalone) {
+    const el = document.getElementById('ptr')!;
+    const THRESHOLD = 70; // px of pull needed to trigger a reload
+    const MAX = 90; // px cap on how far the indicator travels
+    let startY = 0;
+    let pulling = false;
+
+    const setIndicator = (distance: number) => {
+      const clamped = Math.min(distance, MAX);
+      const progress = Math.min(distance / THRESHOLD, 1);
+      el.style.transform = `translateY(${clamped - 56}px) rotate(${progress * 270}deg)`;
+      el.style.opacity = String(progress);
+    };
+
+    const reset = () => {
+      el.style.transition = 'transform 0.2s ease, opacity 0.2s ease';
+      el.style.transform = 'translateY(-56px)';
+      el.style.opacity = '0';
+      setTimeout(() => (el.style.transition = ''), 200);
+    };
+
+    document.addEventListener(
+      'touchstart',
+      (e) => {
+        if (window.scrollY <= 0 && e.touches.length === 1) {
+          startY = e.touches[0].clientY;
+          pulling = true;
+        }
+      },
+      { passive: true },
+    );
+
+    document.addEventListener(
+      'touchmove',
+      (e) => {
+        if (!pulling) return;
+        const delta = e.touches[0].clientY - startY;
+        if (delta <= 0) {
+          pulling = false;
+          reset();
+          return;
+        }
+        // Only take over the gesture while genuinely pulling down from the top.
+        e.preventDefault();
+        setIndicator(delta);
+      },
+      { passive: false },
+    );
+
+    document.addEventListener('touchend', (e) => {
+      if (!pulling) return;
+      pulling = false;
+      const delta = e.changedTouches[0].clientY - startY;
+      if (delta >= THRESHOLD) {
+        el.classList.add('refreshing');
+        setTimeout(() => window.location.reload(), 150);
+      } else {
+        reset();
+      }
+    });
+  }
+</script>
