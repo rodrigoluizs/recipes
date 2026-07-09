@@ -1,5 +1,6 @@
 ---
 import '../styles/global.css';
+import PullToRefresh from '../components/PullToRefresh.astro';
 
 interface Props {
   title: string;
@@ -8,7 +9,11 @@ interface Props {
 
 const SITE_NAME = "Rodrigo's Kitchen";
 const { title, description = 'A personal recipe collection.' } = Astro.props;
-const favicon = `${import.meta.env.BASE_URL}/favicon.svg`.replace(/\/{2,}/g, '/');
+const asset = (path: string) =>
+  `${import.meta.env.BASE_URL}/${path}`.replace(/\/{2,}/g, '/');
+const favicon = asset('favicon.svg');
+const manifest = asset('manifest.webmanifest');
+const appleTouchIcon = asset('apple-touch-icon.png');
 ---
 
 <!doctype html>
@@ -20,8 +25,14 @@ const favicon = `${import.meta.env.BASE_URL}/favicon.svg`.replace(/\/{2,}/g, '/'
     <meta name="theme-color" content="#000000" />
     <title>{`${title} · ${SITE_NAME}`}</title>
     <link rel="icon" type="image/svg+xml" href={favicon} />
+    <link rel="manifest" href={manifest} />
+    <link rel="apple-touch-icon" href={appleTouchIcon} />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+    <meta name="apple-mobile-web-app-title" content={SITE_NAME} />
   </head>
   <body>
+    <PullToRefresh />
     <slot />
   </body>
 </html>
