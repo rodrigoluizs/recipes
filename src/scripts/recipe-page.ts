@@ -1,4 +1,4 @@
-import { scaleAmount, formatQuantity } from '../lib/quantity';
+import { scaleAmount, formatQuantity, roundNice } from '../lib/quantity';
 
 interface ClientIngredient {
   amount?: number;
@@ -13,28 +13,90 @@ interface RecipeClientData {
   ingredients: Record<string, ClientIngredient>;
 }
 
+type Mode = 'amount' | 'serving' | 'ingredient';
+
+const MIN_FACTOR = 0.25;
+const MAX_FACTOR = 8;
+
 const dataEl = document.getElementById('recipe-data');
 if (dataEl?.textContent) {
   init(JSON.parse(dataEl.textContent) as RecipeClientData);
 }
 
+function clamp(n: number): number {
+  if (!Number.isFinite(n) || n <= 0) return 1;
+  return Math.min(MAX_FACTOR, Math.max(MIN_FACTOR, n));
+}
+
 function init(data: RecipeClientData): void {
   const { baseServings } = data;
   let factor = 1;
+  let mode: Mode = 'amount';
+  let selectedName: string | null = null;
 
-  const qtyEls = Array.from(
-    document.querySelectorAll<HTMLElement>('[data-qty]'),
-  );
+  const qtyEls = Array.from(document.querySelectorAll<HTMLElement>('[data-qty]'));
   const servingsEls = Array.from(
     document.querySelectorAll<HTMLElement>('[data-servings]'),
   );
-  const servingsInput = document.getElementById(
-    'scale-servings',
-  ) as HTMLInputElement | null;
+
+  const slider = document.getElementById('scale-slider') as HTMLInputElement | null;
+  const valueBox = document.getElementById('scale-value-box');
+  const valueInput = document.getElementById('scale-value') as HTMLInputElement | null;
+  const prefix = document.getElementById('scale-prefix');
+  const suffix = document.getElementById('scale-suffix');
+  const selectBtn = document.getElementById('scale-select');
+  const selectLabel = document.getElementById('scale-select-label');
+  const hint = document.getElementById('scale-hint');
+  const modeButtons = Array.from(
+    document.querySelectorAll<HTMLButtonElement>('[data-scale-mode]'),
+  );
+  const ingredientsList = document.querySelector<HTMLElement>('.ingredients');
+  const ingredientRows = Array.from(
+    document.querySelectorAll<HTMLElement>('.ingredients .row[data-scalable]'),
+  );
+
+  function updateSliderFill(): void {
+    if (!slider) return;
+    const min = parseFloat(slider.min);
+    const max = parseFloat(slider.max);
+    const pct = ((parseFloat(slider.value) - min) / (max - min)) * 100;
+    slider.style.setProperty('--fill', `${pct}%`);
+  }
+
+  /** The number shown in the editable value box for the current mode. */
+  function currentValue(): number {
+    if (mode === 'serving') return Math.max(1, Math.round(baseServings * factor));
+    if (mode === 'ingredient' && selectedName) {
+      const ing = data.ingredients[selectedName];
+      return ing?.amount !== undefined ? scaleAmount(ing.amount, factor) : 0;
+    }
+    return roundNice(factor);
+  }
+
+  function updateDisplay(): void {
+    // Don't clobber the field while the user is typing in it.
+    if (valueInput && document.activeElement !== valueInput) {
+      valueInput.value = String(currentValue());
+    }
+    if (prefix) prefix.textContent = mode === 'amount' ? '×' : '';
+    if (suffix) {
+      suffix.textContent =
+        mode === 'serving'
+          ? 'servings'
+          : mode === 'ingredient' && selectedName
+            ? (data.ingredients[selectedName]?.unit ?? '')
+            : '';
+    }
+    if (selectLabel) {
+      selectLabel.textContent = selectedName
+        ? (data.ingredients[selectedName]?.name ?? 'Select')
+        : 'Select';
+    }
+  }
 
   /** Recompute every displayed quantity from the current factor. */
-  function applyScale(next: number, updateInput = true): void {
-    factor = next > 0 && Number.isFinite(next) ? next : 1;
+  function applyScale(next: number): void {
+    factor = clamp(next);
 
     for (const el of qtyEls) {
       const base = parseFloat(el.dataset.amount ?? '');
@@ -45,7 +107,12 @@ function init(data: RecipeClientData): void {
 
     const scaledServings = Math.max(1, Math.round(baseServings * factor));
     for (const el of servingsEls) el.textContent = String(scaledServings);
-    if (updateInput && servingsInput) servingsInput.value = String(scaledServings);
+
+    if (slider) {
+      slider.value = String(factor);
+      updateSliderFill();
+    }
+    updateDisplay();
 
     const url = new URL(location.href);
     if (Math.abs(factor - 1) < 1e-9) url.searchParams.delete('servings');
@@ -53,64 +120,76 @@ function init(data: RecipeClientData): void {
     history.replaceState(null, '', url);
   }
 
-  // --- Scale panel toggle -------------------------------------------------
-  const scaleToggle = document.querySelector<HTMLButtonElement>('[data-scale-toggle]');
-  const scalePanel = document.getElementById('scale-panel');
-  scaleToggle?.addEventListener('click', () => {
-    if (scalePanel) scalePanel.hidden = !scalePanel.hidden;
-  });
-
-  // --- Scale by servings --------------------------------------------------
-  function setServings(value: number): void {
-    if (value > 0) applyScale(value / baseServings, false);
-  }
-  servingsInput?.addEventListener('input', () =>
-    setServings(parseFloat(servingsInput.value)),
-  );
+  // --- Panel toggle -------------------------------------------------------
   document
-    .querySelector('[data-servings-inc]')
+    .querySelector<HTMLButtonElement>('[data-scale-toggle]')
     ?.addEventListener('click', () => {
-      const current = Math.round(baseServings * factor);
-      applyScale((current + 1) / baseServings);
-    });
-  document
-    .querySelector('[data-servings-dec]')
-    ?.addEventListener('click', () => {
-      const current = Math.round(baseServings * factor);
-      applyScale(Math.max(1, current - 1) / baseServings);
+      const panel = document.getElementById('scale-panel');
+      if (panel) panel.hidden = !panel.hidden;
     });
 
-  // --- Scale by ingredient ------------------------------------------------
-  const ingredientSelect = document.getElementById(
-    'scale-ingredient',
-  ) as HTMLSelectElement | null;
-  const haveInput = document.getElementById(
-    'scale-have',
-  ) as HTMLInputElement | null;
-  const haveUnit = document.getElementById('scale-have-unit');
-
-  function syncHaveUnit(): void {
-    const opt = ingredientSelect?.selectedOptions[0];
-    if (haveUnit) haveUnit.textContent = opt?.dataset.unit ?? '';
+  // --- Mode switch --------------------------------------------------------
+  function setMode(next: Mode): void {
+    mode = next;
+    for (const b of modeButtons) {
+      b.classList.toggle('is-active', b.dataset.scaleMode === next);
+    }
+    const picking = next === 'ingredient';
+    if (selectBtn) selectBtn.hidden = !picking;
+    // In ingredient mode the value box only appears once a basis is chosen.
+    if (valueBox) valueBox.hidden = picking && selectedName === null;
+    if (hint) hint.hidden = !picking || selectedName !== null;
+    ingredientsList?.classList.toggle('picking', picking);
+    updateDisplay();
   }
-  syncHaveUnit();
-  ingredientSelect?.addEventListener('change', syncHaveUnit);
+  for (const b of modeButtons) {
+    b.addEventListener('click', () => setMode(b.dataset.scaleMode as Mode));
+  }
 
-  haveInput?.addEventListener('input', () => {
-    const opt = ingredientSelect?.selectedOptions[0];
-    const base = parseFloat(opt?.dataset.amount ?? '');
-    const have = parseFloat(haveInput.value);
-    if (!Number.isNaN(base) && base > 0 && !Number.isNaN(have) && have > 0) {
-      applyScale(have / base);
+  // --- Slider (drives the factor in every mode) ---------------------------
+  slider?.addEventListener('input', () => applyScale(parseFloat(slider.value)));
+
+  // --- Typed value (alternative to the slider) ----------------------------
+  valueInput?.addEventListener('input', () => {
+    const v = parseFloat(valueInput.value);
+    if (Number.isNaN(v) || v <= 0) return;
+    if (mode === 'serving') {
+      applyScale(v / baseServings);
+    } else if (mode === 'ingredient' && selectedName) {
+      const base = data.ingredients[selectedName]?.amount;
+      if (base) applyScale(v / base);
+    } else {
+      applyScale(v);
     }
   });
 
+  // --- Ingredient selection (basis to read while scaling) -----------------
+  ingredientsList?.addEventListener(
+    'click',
+    (e) => {
+      if (mode !== 'ingredient') return; // let the checkbox toggle normally
+      const row = (e.target as HTMLElement).closest<HTMLElement>(
+        '.row[data-scalable]',
+      );
+      if (!row) return;
+      e.preventDefault();
+      selectedName = row.dataset.ing ?? null;
+      for (const r of ingredientRows) r.classList.toggle('selected', r === row);
+      if (hint) hint.hidden = true;
+      if (valueBox) valueBox.hidden = false;
+      selectBtn?.classList.add('has-selection');
+      updateDisplay();
+    },
+    true,
+  );
+  selectBtn?.addEventListener('click', () => {
+    if (hint) hint.hidden = selectedName !== null;
+  });
+
+  // --- Reset --------------------------------------------------------------
   document
     .querySelector('[data-scale-reset]')
-    ?.addEventListener('click', () => {
-      applyScale(1);
-      if (haveInput) haveInput.value = '';
-    });
+    ?.addEventListener('click', () => applyScale(1));
 
   // --- Ingredient reference popover (page + cook mode) --------------------
   const popover = document.createElement('div');
@@ -150,10 +229,12 @@ function init(data: RecipeClientData): void {
   // --- Cook mode ----------------------------------------------------------
   setupCookMode();
 
-  // --- Initial factor from URL -------------------------------------------
-  const initial = parseFloat(new URLSearchParams(location.search).get('servings') ?? '');
-  if (!Number.isNaN(initial) && initial > 0) setServings(initial);
-  else applyScale(1);
+  // --- Initial state ------------------------------------------------------
+  setMode('amount');
+  const initial = parseFloat(
+    new URLSearchParams(location.search).get('servings') ?? '',
+  );
+  applyScale(!Number.isNaN(initial) && initial > 0 ? initial / baseServings : 1);
 }
 
 function setupCookMode(): void {
@@ -201,7 +282,7 @@ function setupCookMode(): void {
     overlay!.hidden = false;
     document.body.style.overflow = 'hidden';
     try {
-      wakeLock = await navigator.wakeLock?.request('screen');
+      wakeLock = (await navigator.wakeLock?.request('screen')) ?? null;
     } catch {
       /* wake lock unavailable — fine */
     }
@@ -225,7 +306,6 @@ function setupCookMode(): void {
   nextBtn.addEventListener('click', next);
   prevBtn.addEventListener('click', prev);
 
-  // Swipe navigation.
   let startX = 0;
   overlay.addEventListener(
     'touchstart',

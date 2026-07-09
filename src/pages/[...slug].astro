@@ -1,6 +1,7 @@
 ---
 import { Image } from 'astro:assets';
 import { render } from 'astro:content';
+import { Icon } from 'astro-icon/components';
 import Base from '../layouts/Base.astro';
 import RecipeMeta from '../components/RecipeMeta.astro';
 import IngredientList from '../components/IngredientList.astro';
@@ -52,23 +53,18 @@ const clientData = {
           <div class="hero-fallback"><span aria-hidden="true">🍽️</span></div>
         )
       }
-      <a class="round back" href={href('')} aria-label="Back to all recipes">‹</a>
+      <a class="round back" href={href('')} aria-label="Back to all recipes">
+        <Icon name="lucide:chevron-left" size={24} />
+      </a>
       <button class="round share" type="button" data-share aria-label="Share recipe">
-        <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"
-          ><path
-            fill="currentColor"
-            d="M13 5.83l2.59 2.58L17 7l-5-5-5 5 1.41 1.41L11 5.83V16h2ZM5 18v-6H3v6a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-6h-2v6Z"
-          ></path></svg
-        >
+        <Icon name="lucide:share" size={20} />
       </button>
     </div>
 
     <div class="container">
       <div class="actions">
         <button class="start" type="button" data-cook-start>
-          <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"
-            ><path fill="currentColor" d="M8 5v14l11-7z"></path></svg
-          >
+          <Icon name="lucide:play" size={20} />
           Start
         </button>
       </div>
@@ -86,7 +82,7 @@ const clientData = {
           <h2>Ingredients</h2>
           <button class="scale-btn accent" type="button" data-scale-toggle>Scale</button>
         </div>
-        <ScaleControl ingredients={data.ingredients} />
+        <ScaleControl ingredients={data.ingredients} servings={data.servings} />
         <IngredientList ingredients={data.ingredients} />
       </section>
 
@@ -152,6 +148,10 @@ const clientData = {
 </script>
 
 <style>
+  article {
+    max-width: 760px;
+    margin: 0 auto;
+  }
   .hero {
     position: relative;
     aspect-ratio: 3 / 2;
