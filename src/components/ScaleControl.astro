@@ -1,52 +1,63 @@
 ---
+import { Icon } from 'astro-icon/components';
 import type { Ingredient } from '../lib/types';
 
 interface Props {
   ingredients: Ingredient[];
+  servings: number;
 }
 
-const { ingredients } = Astro.props;
+const { ingredients, servings } = Astro.props;
 // Only ingredients with a numeric amount can be used as a scaling basis.
 const scalable = ingredients.filter((i) => i.amount !== undefined);
 ---
 
 <div class="scale-panel" id="scale-panel" hidden>
-  <div class="field">
-    <label for="scale-servings">Servings</label>
-    <div class="stepper">
-      <button type="button" data-servings-dec aria-label="Fewer servings">−</button>
+  <div class="segmented" role="tablist" aria-label="Scaling mode">
+    <button type="button" role="tab" class="seg is-active" data-scale-mode="amount">amount</button>
+    <button type="button" role="tab" class="seg" data-scale-mode="serving">serving</button>
+    {scalable.length > 0 && (
+      <button type="button" role="tab" class="seg" data-scale-mode="ingredient">ingredient</button>
+    )}
+  </div>
+
+  <div class="row">
+    <div class="slider-wrap">
       <input
-        id="scale-servings"
-        type="number"
-        min="1"
-        step="1"
-        inputmode="numeric"
+        id="scale-slider"
+        type="range"
+        min="0.25"
+        max="8"
+        step="0.25"
+        value="1"
+        data-base-servings={servings}
+        aria-label="Scale"
       />
-      <button type="button" data-servings-inc aria-label="More servings">+</button>
+    </div>
+
+    <!-- ingredient mode: pick which ingredient to scale by -->
+    <button type="button" class="select-btn" id="scale-select" hidden>
+      <Icon name="lucide:carrot" size={18} />
+      <span id="scale-select-label">Select</span>
+    </button>
+
+    <!-- editable value (type instead of / alongside the slider) -->
+    <div class="value-box" id="scale-value-box">
+      <span class="affix" id="scale-prefix">×</span>
+      <input
+        id="scale-value"
+        type="number"
+        min="0"
+        step="any"
+        inputmode="decimal"
+        value="1"
+        aria-label="Scale value"
+      />
+      <span class="affix suffix" id="scale-suffix"></span>
     </div>
   </div>
 
-  {
-    scalable.length > 0 && (
-      <div class="field">
-        <label for="scale-ingredient">Or scale by ingredient</label>
-        <div class="by-ingredient">
-          <select id="scale-ingredient">
-            {scalable.map((i) => (
-              <option value={i.name} data-amount={i.amount} data-unit={i.unit ?? ''}>
-                {i.name}
-              </option>
-            ))}
-          </select>
-          <div class="have">
-            <span class="muted">I have</span>
-            <input id="scale-have" type="number" min="0" step="any" inputmode="decimal" />
-            <span class="unit" id="scale-have-unit"></span>
-          </div>
-        </div>
-      </div>
-    )
-  }
+  <p class="hint" id="scale-hint" hidden>Tap an ingredient below to scale by it.</p>
 
   <button type="button" class="reset" data-scale-reset>Reset to original</button>
 </div>
@@ -64,63 +75,134 @@ const scalable = ingredients.filter((i) => i.amount !== undefined);
   .scale-panel[hidden] {
     display: none;
   }
-  .field {
+
+  .segmented {
     display: flex;
-    flex-direction: column;
-    gap: 8px;
-  }
-  label {
-    font-size: 0.9rem;
-    color: var(--muted);
-  }
-  .stepper {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-  }
-  .stepper button {
-    width: 40px;
-    height: 40px;
-    border: 0;
-    border-radius: 10px;
     background: var(--surface-2);
-    color: var(--fg);
-    font-size: 1.4rem;
-    line-height: 1;
+    border-radius: 12px;
+    padding: 4px;
+    gap: 4px;
   }
-  input[type='number'] {
-    width: 90px;
-    height: 40px;
+  .seg {
+    flex: 1;
     border: 0;
-    border-radius: 10px;
-    background: var(--surface-2);
+    background: transparent;
     color: var(--fg);
-    text-align: center;
-    font-size: 1.05rem;
-  }
-  .by-ingredient {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 12px;
-    align-items: center;
-  }
-  select {
-    height: 40px;
-    border: 0;
-    border-radius: 10px;
-    background: var(--surface-2);
-    color: var(--fg);
-    padding: 0 12px;
+    padding: 10px 8px;
+    border-radius: 9px;
     font-size: 1rem;
+    font-weight: 600;
   }
-  .have {
+  .seg.is-active {
+    background: #55555a;
+  }
+
+  .row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .slider-wrap {
+    flex: 1;
+    min-width: 0;
+  }
+
+  input[type='range'] {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 100%;
+    height: 12px;
+    border-radius: var(--radius-pill);
+    background:
+      linear-gradient(var(--accent) 0 0) no-repeat,
+      var(--surface-2);
+    background-size: var(--fill, 12%) 100%;
+    cursor: pointer;
+  }
+  input[type='range']::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    background: #fff;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.5);
+  }
+  input[type='range']::-moz-range-thumb {
+    width: 34px;
+    height: 34px;
+    border: 0;
+    border-radius: 50%;
+    background: #fff;
+  }
+
+  .value-box {
+    flex: 0 0 auto;
+    display: inline-flex;
+    align-items: baseline;
+    gap: 4px;
+    background: var(--surface-2);
+    border-radius: 14px;
+    padding: 10px 14px;
+    color: var(--accent);
+    font-weight: 700;
+  }
+  .value-box[hidden] {
+    display: none;
+  }
+  .value-box .affix {
+    font-size: 1.2rem;
+  }
+  .value-box .suffix {
+    color: var(--muted);
+    font-size: 0.95rem;
+  }
+  #scale-value {
+    width: 3.5ch;
+    border: 0;
+    background: transparent;
+    color: var(--accent);
+    font: inherit;
+    font-size: 1.5rem;
+    text-align: center;
+    -moz-appearance: textfield;
+    appearance: textfield;
+  }
+  #scale-value::-webkit-outer-spin-button,
+  #scale-value::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+
+  .select-btn {
+    flex: 0 0 auto;
     display: inline-flex;
     align-items: center;
     gap: 8px;
-  }
-  .unit {
+    border: 0;
+    background: var(--surface-2);
     color: var(--muted);
+    border-radius: 14px;
+    padding: 12px 16px;
+    font-size: 1.05rem;
+    font-weight: 700;
   }
+  .select-btn[hidden] {
+    display: none;
+  }
+  .select-btn.has-selection {
+    color: var(--accent);
+  }
+
+  .hint {
+    margin: 0;
+    color: var(--muted);
+    font-size: 0.9rem;
+  }
+  .hint[hidden] {
+    display: none;
+  }
+
   .reset {
     align-self: flex-start;
     border: 0;

@@ -13,7 +13,11 @@ const { ingredients } = Astro.props;
   {
     ingredients.map((ing) => (
       <li>
-        <label class="row">
+        <label
+          class="row"
+          data-ing={ing.name.toLowerCase()}
+          data-scalable={ing.amount !== undefined ? 'true' : undefined}
+        >
           <input type="checkbox" class="tick" />
           <span class="text">
             {ing.amount !== undefined && (
@@ -86,5 +90,18 @@ const { ingredients } = Astro.props;
   .row:has(.tick:checked) .text {
     text-decoration: line-through;
     color: var(--muted);
+  }
+
+  /* Ingredient-mode selection (scaling basis). */
+  .row.selected {
+    outline: 2px solid var(--accent);
+    outline-offset: -2px;
+    border-radius: 10px;
+  }
+  :global(.picking) .row[data-scalable] {
+    cursor: pointer;
+  }
+  :global(.picking) .row[data-scalable] .tick {
+    visibility: hidden;
   }
 </style>
