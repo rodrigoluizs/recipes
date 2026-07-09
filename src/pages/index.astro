@@ -1,4 +1,5 @@
 ---
+import { Icon } from 'astro-icon/components';
 import Base from '../layouts/Base.astro';
 import RecipeCard from '../components/RecipeCard.astro';
 import {
@@ -16,12 +17,7 @@ const categories = getCategories(recipes);
     <h1>All Recipes</h1>
 
     <div class="search">
-      <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
-        <path
-          fill="currentColor"
-          d="M10 2a8 8 0 1 0 4.9 14.3l5.4 5.4 1.4-1.4-5.4-5.4A8 8 0 0 0 10 2Zm0 2a6 6 0 1 1 0 12 6 6 0 0 1 0-12Z"
-        ></path>
-      </svg>
+      <Icon name="lucide:search" size={20} />
       <input
         id="search"
         type="search"
