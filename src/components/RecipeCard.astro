@@ -1,0 +1,149 @@
+---
+import { Image } from 'astro:assets';
+import type { RecipeEntry } from '../lib/recipes';
+import { categoryOf } from '../lib/recipes';
+import { totalTime } from '../lib/duration';
+import { href } from '../lib/url';
+
+interface Props {
+  recipe: RecipeEntry;
+}
+
+const { recipe } = Astro.props;
+const { title, servings, prepTime, cookTime, image, tags } = recipe.data;
+const category = categoryOf(recipe.id);
+const time = totalTime(prepTime, cookTime);
+
+// Deterministic fallback gradient when there is no photo.
+const palettes = [
+  ['#3a1c71', '#d76d77'],
+  ['#134e5e', '#71b280'],
+  ['#42275a', '#734b6d'],
+  ['#004e92', '#000428'],
+  ['#870000', '#190a05'],
+  ['#1f4037', '#99f2c8'],
+];
+let hash = 0;
+for (const ch of recipe.id) hash = (hash * 31 + ch.charCodeAt(0)) >>> 0;
+const [c1, c2] = palettes[hash % palettes.length];
+
+// Lowercased haystacks for client-side search filtering.
+const searchTitle = title.toLowerCase();
+const searchTags = tags.join(' ').toLowerCase();
+const searchIngredients = recipe.data.ingredients
+  .map((i) => i.name)
+  .join(' ')
+  .toLowerCase();
+---
+
+<a
+  class="card"
+  href={href(recipe.id)}
+  data-recipe-card
+  data-title={searchTitle}
+  data-tags={searchTags}
+  data-ingredients={searchIngredients}
+  data-category={category}
+>
+  <div class="media">
+    {
+      image ? (
+        <Image src={image} alt={title} widths={[320, 640]} sizes="(max-width: 640px) 100vw, 460px" />
+      ) : (
+        <div class="fallback" style={`background:linear-gradient(135deg, ${c1}, ${c2});`}>
+          <span aria-hidden="true">🍽️</span>
+        </div>
+      )
+    }
+    <span class="scrim"></span>
+    <h2 class="title">{title}</h2>
+    <div class="meta">
+      <span class="chip">
+        <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path fill="currentColor" d="M16 11a3 3 0 1 0-3-3 3 3 0 0 0 3 3Zm-8 0a3 3 0 1 0-3-3 3 3 0 0 0 3 3Zm0 2c-2.7 0-8 1.34-8 4v2h10v-2c0-.96.7-1.83 1.86-2.5A13.6 13.6 0 0 0 8 13Zm8 0c-.35 0-.74 0-1.16.05C16.17 14 17 15 17 16v2h7v-2c0-2.66-5.3-4-8-4Z"/></svg>
+        <span>{servings}</span>
+      </span>
+      <span class="chip">
+        <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path fill="currentColor" d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2Zm0 18a8 8 0 1 1 8-8 8 8 0 0 1-8 8Zm.5-13H11v6l5.2 3.1.8-1.3-4.5-2.7Z"/></svg>
+        <span>{time}</span>
+      </span>
+    </div>
+  </div>
+</a>
+
+<style>
+  .card {
+    display: block;
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    background: var(--surface);
+  }
+  .media {
+    position: relative;
+    aspect-ratio: 3 / 2;
+  }
+  .media :global(img),
+  .fallback {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .fallback {
+    display: grid;
+    place-items: center;
+    font-size: 3rem;
+  }
+  .scrim {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      180deg,
+      rgba(0, 0, 0, 0.55) 0%,
+      rgba(0, 0, 0, 0) 40%,
+      rgba(0, 0, 0, 0.1) 70%,
+      rgba(0, 0, 0, 0.55) 100%
+    );
+  }
+  .title {
+    position: absolute;
+    top: 12px;
+    left: 14px;
+    right: 14px;
+    margin: 0;
+    font-size: 1.35rem;
+    font-weight: 800;
+    line-height: 1.15;
+    text-shadow: 0 1px 8px rgba(0, 0, 0, 0.6);
+  }
+  .meta {
+    position: absolute;
+    left: 12px;
+    bottom: 12px;
+    display: flex;
+    gap: 8px;
+  }
+  .chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    border-radius: var(--radius-pill);
+    background: rgba(0, 0, 0, 0.55);
+    backdrop-filter: blur(6px);
+    font-size: 0.9rem;
+    font-weight: 600;
+  }
+  .chip svg {
+    opacity: 0.85;
+  }
+  .card:hover .title {
+    text-decoration: none;
+  }
+  @media (hover: hover) {
+    .card {
+      transition: transform 0.15s ease;
+    }
+    .card:hover {
+      transform: translateY(-2px);
+    }
+  }
+</style>
