@@ -83,3 +83,19 @@ button {
   font-family: inherit;
   cursor: pointer;
 }
+
+/* Ingredient quantity popover (shared by recipe page and cook mode). */
+.ingredient-popover {
+  position: absolute;
+  z-index: 200;
+  max-width: 60vw;
+  padding: 8px 12px;
+  border-radius: 10px;
+  background: var(--surface-2);
+  color: var(--fg);
+  font-size: 0.95rem;
+  font-weight: 600;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+  pointer-events: none;
+}
+

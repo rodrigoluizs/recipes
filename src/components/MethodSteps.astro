@@ -1,0 +1,76 @@
+---
+import { parseStep } from '../lib/references';
+
+interface Props {
+  method: string[];
+}
+
+const { method } = Astro.props;
+const steps = method.map((step) => parseStep(step));
+---
+
+<ol class="method" role="list">
+  {
+    steps.map((tokens, i) => (
+      <li class="step" data-step-index={i}>
+        <span class="badge">{i + 1}</span>
+        <p class="body">
+          {tokens.map((t) =>
+            t.type === 'ref' ? (
+              <button type="button" class="ref accent" data-ingredient={t.name}>
+                {t.name}
+              </button>
+            ) : (
+              <span>{t.value}</span>
+            ),
+          )}
+        </p>
+      </li>
+    ))
+  }
+</ol>
+
+<style>
+  .method {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .step {
+    display: flex;
+    gap: 14px;
+    background: var(--surface);
+    border-radius: var(--radius);
+    padding: 16px;
+  }
+  .badge {
+    flex: 0 0 auto;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: var(--accent);
+    color: #fff;
+    font-weight: 700;
+    display: grid;
+    place-items: center;
+    font-size: 0.95rem;
+  }
+  .body {
+    margin: 0;
+    font-size: 1.1rem;
+    line-height: 1.5;
+  }
+  .ref {
+    border: 0;
+    background: none;
+    padding: 0;
+    font: inherit;
+    font-weight: 600;
+    color: var(--accent);
+    cursor: pointer;
+    border-bottom: 1px dashed color-mix(in srgb, var(--accent) 55%, transparent);
+  }
+</style>

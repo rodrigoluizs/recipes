@@ -1,0 +1,255 @@
+---
+import { Image } from 'astro:assets';
+import { render } from 'astro:content';
+import Base from '../layouts/Base.astro';
+import RecipeMeta from '../components/RecipeMeta.astro';
+import IngredientList from '../components/IngredientList.astro';
+import MethodSteps from '../components/MethodSteps.astro';
+import ScaleControl from '../components/ScaleControl.astro';
+import CookMode from '../components/CookMode.astro';
+import { getAllRecipes } from '../lib/recipes';
+import { validateSteps } from '../lib/references';
+import { href } from '../lib/url';
+
+export async function getStaticPaths() {
+  const recipes = await getAllRecipes();
+  return recipes.map((recipe) => ({
+    params: { slug: recipe.id },
+    props: { recipe },
+  }));
+}
+
+const { recipe } = Astro.props;
+const { data } = recipe;
+const { Content } = await render(recipe);
+
+// Warn (at build time) about ingredient references that don't resolve.
+const unmatched = validateSteps(data.method, data.ingredients);
+if (unmatched.length > 0) {
+  console.warn(
+    `[recipes] ${recipe.id}: unmatched ingredient references: ${unmatched.join(', ')}`,
+  );
+}
+
+const nutritionEntries = data.nutrition ? Object.entries(data.nutrition) : [];
+
+// Payload for the client controller (scaling + popovers).
+const clientData = {
+  baseServings: data.servings,
+  ingredients: Object.fromEntries(
+    data.ingredients.map((i) => [i.name.toLowerCase(), i]),
+  ),
+};
+---
+
+<Base title={data.title} description={`${data.title} recipe`}>
+  <article>
+    <div class="hero">
+      {
+        data.image ? (
+          <Image src={data.image} alt={data.title} widths={[480, 960]} sizes="100vw" />
+        ) : (
+          <div class="hero-fallback"><span aria-hidden="true">🍽️</span></div>
+        )
+      }
+      <a class="round back" href={href('')} aria-label="Back to all recipes">‹</a>
+      <button class="round share" type="button" data-share aria-label="Share recipe">
+        <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"
+          ><path
+            fill="currentColor"
+            d="M13 5.83l2.59 2.58L17 7l-5-5-5 5 1.41 1.41L11 5.83V16h2ZM5 18v-6H3v6a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-6h-2v6Z"
+          ></path></svg
+        >
+      </button>
+    </div>
+
+    <div class="container">
+      <div class="actions">
+        <button class="start" type="button" data-cook-start>
+          <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"
+            ><path fill="currentColor" d="M8 5v14l11-7z"></path></svg
+          >
+          Start
+        </button>
+      </div>
+
+      <h1>{data.title}</h1>
+
+      <RecipeMeta
+        servings={data.servings}
+        prepTime={data.prepTime}
+        cookTime={data.cookTime}
+      />
+
+      <section>
+        <div class="section-head">
+          <h2>Ingredients</h2>
+          <button class="scale-btn accent" type="button" data-scale-toggle>Scale</button>
+        </div>
+        <ScaleControl ingredients={data.ingredients} />
+        <IngredientList ingredients={data.ingredients} />
+      </section>
+
+      <section>
+        <h2>Method</h2>
+        <MethodSteps method={data.method} />
+      </section>
+
+      {
+        nutritionEntries.length > 0 && (
+          <section>
+            <h2>Nutrition</h2>
+            <p class="muted note">Per original serving ({data.servings} servings).</p>
+            <ul class="nutrition">
+              {nutritionEntries.map(([k, v]) => (
+                <li>
+                  <span class="muted">{k}</span>
+                  <span>{v}</span>
+                </li>
+              ))}
+            </ul>
+          </section>
+        )
+      }
+
+      <section class="notes">
+        <Content />
+      </section>
+
+      {data.sourceUrl && (
+        <a class="source" href={data.sourceUrl} target="_blank" rel="noopener">
+          View original source ↗
+        </a>
+      )}
+    </div>
+
+    <CookMode />
+  </article>
+
+  <script
+    is:inline
+    type="application/json"
+    id="recipe-data"
+    set:html={JSON.stringify(clientData)}
+  />
+</Base>
+
+<script>
+  import '../scripts/recipe-page.ts';
+
+  document.querySelector('[data-share]')?.addEventListener('click', async () => {
+    const shareData = { title: document.title, url: location.href };
+    try {
+      if (navigator.share) await navigator.share(shareData);
+      else {
+        await navigator.clipboard.writeText(location.href);
+        alert('Link copied to clipboard');
+      }
+    } catch {
+      /* user cancelled — ignore */
+    }
+  });
+</script>
+
+<style>
+  .hero {
+    position: relative;
+    aspect-ratio: 3 / 2;
+    max-height: 42vh;
+    overflow: hidden;
+  }
+  .hero :global(img),
+  .hero-fallback {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .hero-fallback {
+    display: grid;
+    place-items: center;
+    font-size: 4rem;
+    background: linear-gradient(135deg, #232526, #414345);
+  }
+  .round {
+    position: absolute;
+    top: 16px;
+    width: 40px;
+    height: 40px;
+    border: 0;
+    border-radius: 50%;
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(6px);
+    color: #fff;
+    display: grid;
+    place-items: center;
+    font-size: 1.6rem;
+    line-height: 1;
+  }
+  .back {
+    left: 16px;
+  }
+  .share {
+    right: 16px;
+    font-size: 1rem;
+  }
+  .actions {
+    margin: -32px 0 8px;
+    position: relative;
+  }
+  .start {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    border: 0;
+    padding: 14px 28px;
+    border-radius: var(--radius-pill);
+    background: var(--start);
+    color: #062b12;
+    font-size: 1.15rem;
+    font-weight: 800;
+    box-shadow: 0 8px 24px rgba(52, 199, 89, 0.35);
+  }
+  h2 {
+    font-size: 1.5rem;
+    font-weight: 800;
+    margin: 32px 0 12px;
+  }
+  .section-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .scale-btn {
+    border: 0;
+    background: var(--surface);
+    padding: 8px 18px;
+    border-radius: var(--radius-pill);
+    font-weight: 700;
+    font-size: 1rem;
+  }
+  .note {
+    margin: 0 0 10px;
+    font-size: 0.9rem;
+  }
+  .nutrition {
+    list-style: none;
+    margin: 0;
+    padding: 8px 4px;
+    background: var(--surface);
+    border-radius: var(--radius);
+  }
+  .nutrition li {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px 14px;
+  }
+  .notes :global(p) {
+    color: var(--muted);
+  }
+  .source {
+    display: inline-block;
+    margin-top: 24px;
+    color: var(--accent);
+    font-weight: 600;
+  }
+</style>

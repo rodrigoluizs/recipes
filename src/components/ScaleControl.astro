@@ -1,0 +1,130 @@
+---
+import type { Ingredient } from '../lib/types';
+
+interface Props {
+  ingredients: Ingredient[];
+}
+
+const { ingredients } = Astro.props;
+// Only ingredients with a numeric amount can be used as a scaling basis.
+const scalable = ingredients.filter((i) => i.amount !== undefined);
+---
+
+<div class="scale-panel" id="scale-panel" hidden>
+  <div class="field">
+    <label for="scale-servings">Servings</label>
+    <div class="stepper">
+      <button type="button" data-servings-dec aria-label="Fewer servings">−</button>
+      <input
+        id="scale-servings"
+        type="number"
+        min="1"
+        step="1"
+        inputmode="numeric"
+      />
+      <button type="button" data-servings-inc aria-label="More servings">+</button>
+    </div>
+  </div>
+
+  {
+    scalable.length > 0 && (
+      <div class="field">
+        <label for="scale-ingredient">Or scale by ingredient</label>
+        <div class="by-ingredient">
+          <select id="scale-ingredient">
+            {scalable.map((i) => (
+              <option value={i.name} data-amount={i.amount} data-unit={i.unit ?? ''}>
+                {i.name}
+              </option>
+            ))}
+          </select>
+          <div class="have">
+            <span class="muted">I have</span>
+            <input id="scale-have" type="number" min="0" step="any" inputmode="decimal" />
+            <span class="unit" id="scale-have-unit"></span>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  <button type="button" class="reset" data-scale-reset>Reset to original</button>
+</div>
+
+<style>
+  .scale-panel {
+    background: var(--surface);
+    border-radius: var(--radius);
+    padding: 16px;
+    margin: 8px 0 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+  .field {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  label {
+    font-size: 0.9rem;
+    color: var(--muted);
+  }
+  .stepper {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .stepper button {
+    width: 40px;
+    height: 40px;
+    border: 0;
+    border-radius: 10px;
+    background: var(--surface-2);
+    color: var(--fg);
+    font-size: 1.4rem;
+    line-height: 1;
+  }
+  input[type='number'] {
+    width: 90px;
+    height: 40px;
+    border: 0;
+    border-radius: 10px;
+    background: var(--surface-2);
+    color: var(--fg);
+    text-align: center;
+    font-size: 1.05rem;
+  }
+  .by-ingredient {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    align-items: center;
+  }
+  select {
+    height: 40px;
+    border: 0;
+    border-radius: 10px;
+    background: var(--surface-2);
+    color: var(--fg);
+    padding: 0 12px;
+    font-size: 1rem;
+  }
+  .have {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .unit {
+    color: var(--muted);
+  }
+  .reset {
+    align-self: flex-start;
+    border: 0;
+    background: none;
+    color: var(--accent);
+    font-weight: 600;
+    font-size: 0.95rem;
+    padding: 0;
+  }
+</style>
