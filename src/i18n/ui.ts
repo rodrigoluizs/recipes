@@ -54,7 +54,7 @@ export interface UIStrings {
 export const ui: Record<Locale, UIStrings> = {
   en: {
     siteName: "Rodrigo's Kitchen",
-    allRecipes: 'All Recipes',
+    allRecipes: 'Recipes',
     searchPlaceholder: 'Recipes, Ingredients and More',
     filterAll: 'All',
     noRecipesYet: 'No recipes yet — add your first one.',
@@ -96,7 +96,7 @@ export const ui: Record<Locale, UIStrings> = {
   },
   pt: {
     siteName: 'Cozinha do Rodrigo',
-    allRecipes: 'Todas as Receitas',
+    allRecipes: 'Receitas',
     searchPlaceholder: 'Receitas, ingredientes e mais',
     filterAll: 'Todas',
     noRecipesYet: 'Nenhuma receita ainda — adicione a primeira.',
