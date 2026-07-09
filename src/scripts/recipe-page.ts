@@ -227,7 +227,7 @@ function init(data: RecipeClientData): void {
   window.addEventListener('scroll', hidePopover, { passive: true });
 
   // --- Cook mode ----------------------------------------------------------
-  setupCookMode();
+  setupCookMode(hidePopover);
 
   // --- Initial state ------------------------------------------------------
   setMode('amount');
@@ -237,7 +237,7 @@ function init(data: RecipeClientData): void {
   applyScale(!Number.isNaN(initial) && initial > 0 ? initial / baseServings : 1);
 }
 
-function setupCookMode(): void {
+function setupCookMode(hidePopover: () => void): void {
   const overlay = document.getElementById('cook-mode');
   const stepEl = overlay?.querySelector<HTMLElement>('[data-cook-step]');
   const progress = overlay?.querySelector<HTMLElement>('[data-cook-progress]');
@@ -256,6 +256,7 @@ function setupCookMode(): void {
   let wakeLock: WakeLockSentinel | null = null;
 
   function render(): void {
+    hidePopover(); // clear any ingredient tooltip from the previous step
     stepEl!.innerHTML = stepBodies[index];
     progress!.textContent = `Step ${index + 1} of ${stepBodies.length}`;
     prevBtn!.disabled = index === 0;
