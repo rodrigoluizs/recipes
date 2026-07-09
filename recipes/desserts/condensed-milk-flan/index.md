@@ -42,6 +42,7 @@ method:
   - "Check for doneness: the edges should be firm and the center should wobble gently like jelly, the top should be smooth with no cracks, and a skewer should come out moist with no raw liquid."
   - Let cool, then refrigerate for at least 6 hours, ideally overnight. It firms up a lot even if it looks soft while still warm.
   - To unmold, run a thin knife around the edge, warm the bottom of the pan briefly over low heat, then invert onto a larger plate.
+image: ./condensed-milk-flan.png
 tags: [dessert, brazilian, flan, custard]
 ---
 
