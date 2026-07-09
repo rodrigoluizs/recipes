@@ -17,59 +17,63 @@ const total = totalTime(prepTime, cookTime, { hr: s.durHr, min: s.durMin });
 ---
 
 <div class="meta">
-  <div class="pill servings">
-    <Icon name="lucide:users" size={18} />
-    <span data-servings data-base-servings={servings}>{servings}</span>
+  <div class="stat">
+    <Icon name="lucide:users" size={20} />
+    <span class="val" data-servings data-base-servings={servings}>{servings}</span>
+    <span class="lbl">{s.servings}</span>
   </div>
-  <div class="pill times">
-    <span class="t">
-      <Icon name="lucide:clock" size={16} />
-      <span class="muted">{s.prep}</span> {prepTime}
-    </span>
-    <span class="sep" aria-hidden="true"></span>
-    <span class="t">
-      <Icon name="lucide:flame" size={16} />
-      <span class="muted">{s.cook}</span> {cookTime}
-    </span>
+  <div class="stat">
+    <Icon name="lucide:clock" size={20} />
+    <span class="val">{prepTime}</span>
+    <span class="lbl">{s.prep}</span>
   </div>
-  <div class="pill total" title={s.totalTitle}>
-    <span class="muted">{s.total}</span> {total}
+  <div class="stat">
+    <Icon name="lucide:flame" size={20} />
+    <span class="val">{cookTime}</span>
+    <span class="lbl">{s.cook}</span>
+  </div>
+  <div class="stat" title={s.totalTitle}>
+    <Icon name="lucide:timer" size={20} />
+    <span class="val">{total}</span>
+    <span class="lbl">{s.total}</span>
   </div>
 </div>
 
 <style>
   .meta {
     display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-    margin: 18px 0 8px;
-  }
-  .pill {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
+    align-items: stretch;
     background: var(--surface);
     border-radius: var(--radius);
-    padding: 12px 16px;
-    font-weight: 600;
+    margin: 18px 0 8px;
+    overflow: hidden;
   }
-  .servings {
-    font-size: 1.05rem;
-  }
-  .times {
-    gap: 14px;
-  }
-  .t {
-    display: inline-flex;
+  .stat {
+    flex: 1 1 0;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
     align-items: center;
-    gap: 6px;
+    justify-content: flex-start;
+    gap: 4px;
+    padding: 14px 8px;
+    text-align: center;
   }
-  .times svg {
+  .stat + .stat {
+    border-left: 1px solid var(--surface-2);
+  }
+  .stat svg {
     opacity: 0.7;
+    flex-shrink: 0;
   }
-  .sep {
-    width: 1px;
-    height: 20px;
-    background: var(--surface-2);
+  .val {
+    font-weight: 600;
+    font-size: 1rem;
+    line-height: 1.2;
+    text-wrap: balance;
+  }
+  .lbl {
+    font-size: 0.8rem;
+    color: var(--muted);
   }
 </style>
