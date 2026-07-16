@@ -32,7 +32,7 @@ ingredients:
     unit: g
     name: salt
     note: or two generous pinches
-  - amount: 1
+  - amount: 2
     name: egg
     note: whole
 method:
