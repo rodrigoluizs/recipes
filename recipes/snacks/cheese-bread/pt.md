@@ -32,7 +32,7 @@ ingredients:
     unit: g
     name: sal
     note: ou duas pitadas generosas
-  - amount: 1
+  - amount: 2
     name: ovo
     note: inteiro
 method:
