@@ -1,6 +1,7 @@
 ---
 import { Icon } from 'astro-icon/components';
 import Base from '../../layouts/Base.astro';
+import PullToRefresh from '../../components/PullToRefresh.astro';
 import RecipeCard from '../../components/RecipeCard.astro';
 import LangToggle from '../../components/LangToggle.astro';
 import { getRecipesByLocale, getCategories } from '../../lib/recipes';
@@ -24,6 +25,7 @@ const alternates = LOCALES.map((l) => ({
 ---
 
 <Base title={s.allRecipes} locale={locale} alternates={alternates}>
+  <PullToRefresh />
   <main class="container">
     <div class="head">
       <h1>{s.allRecipes}</h1>

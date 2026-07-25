@@ -1,6 +1,5 @@
 ---
 import '../styles/global.css';
-import PullToRefresh from '../components/PullToRefresh.astro';
 import { t } from '../i18n/ui';
 import type { Locale } from '../i18n/config';
 
@@ -24,6 +23,7 @@ const asset = (path: string) =>
 const favicon = asset('favicon.svg');
 const manifest = asset('manifest.webmanifest');
 const appleTouchIcon = asset('apple-touch-icon.png');
+const serviceWorker = asset('sw.js');
 ---
 
 <!doctype html>
@@ -47,7 +47,6 @@ const appleTouchIcon = asset('apple-touch-icon.png');
     }
   </head>
   <body>
-    <PullToRefresh />
     <slot />
     <script is:inline define:vars={{ locale }}>
       // Remember the language the visitor is actually viewing so the root
@@ -56,6 +55,14 @@ const appleTouchIcon = asset('apple-touch-icon.png');
         localStorage.setItem('recipes:lang', locale);
       } catch {
         /* storage blocked — detection falls back to navigator.language */
+      }
+    </script>
+    <script is:inline define:vars={{ serviceWorker }}>
+      // Cache-first offline support for the installed PWA. Requires a
+      // secure context (HTTPS or localhost) — silently no-ops otherwise,
+      // e.g. when testing over a plain-HTTP LAN address.
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register(serviceWorker).catch(() => {});
       }
     </script>
   </body>
