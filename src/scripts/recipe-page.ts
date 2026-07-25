@@ -292,11 +292,13 @@ function setupCookMode(hidePopover: () => void, strings: ClientStrings): void {
     }
   }
 
+  const scroller = document.getElementById('hero-scroll');
+
   async function open(): Promise<void> {
     index = 0;
     render();
     overlay!.hidden = false;
-    document.body.style.overflow = 'hidden';
+    if (scroller) scroller.style.overflow = 'hidden';
     try {
       wakeLock = (await navigator.wakeLock?.request('screen')) ?? null;
     } catch {
@@ -306,7 +308,7 @@ function setupCookMode(hidePopover: () => void, strings: ClientStrings): void {
   }
   function close(): void {
     overlay!.hidden = true;
-    document.body.style.overflow = '';
+    if (scroller) scroller.style.overflow = '';
     wakeLock?.release().catch(() => {});
     wakeLock = null;
     document.removeEventListener('keydown', onKey);

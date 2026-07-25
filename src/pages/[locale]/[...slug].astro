@@ -63,36 +63,46 @@ const clientData = {
 ---
 
 <Base title={data.title} locale={locale} description={data.title} alternates={alternates}>
-  <article>
-    <div class="hero">
-      {
-        data.image ? (
-          <Image src={data.image} alt={data.title} widths={[480, 960]} sizes="100vw" />
-        ) : (
-          <div class="hero-fallback"><span aria-hidden="true">🍽️</span></div>
-        )
-      }
-      <a class="round back" href={localeHref(locale)} aria-label={s.backToRecipes}>
-        <Icon name="lucide:chevron-left" size={24} />
-      </a>
-      <div class="hero-actions">
-        <LangToggle locale={locale} path={key} variant="overlay" />
-        <button class="round share" type="button" data-share aria-label={s.shareRecipe}>
-          <Icon name="lucide:share" size={20} />
-        </button>
-      </div>
+  <div class="hero-scene">
+  <div class="hero-photo" id="hero-photo">
+    {
+      data.image ? (
+        <Image src={data.image} alt={data.title} widths={[480, 960]} sizes="100vw" />
+      ) : (
+        <div class="hero-fallback"><span aria-hidden="true">🍽️</span></div>
+      )
+    }
+    <div class="scrim" aria-hidden="true"></div>
+  </div>
+
+  <a class="round back" href={localeHref(locale)} aria-label={s.backToRecipes}>
+    <Icon name="lucide:chevron-left" size={24} />
+  </a>
+  <div class="hero-actions">
+    <LangToggle locale={locale} path={key} variant="overlay" />
+    <button class="round share" type="button" data-share aria-label={s.shareRecipe}>
+      <Icon name="lucide:share" size={20} />
+    </button>
+  </div>
+
+  <div class="topbar" id="hero-topbar">
+    <span class="topbar-title">{data.title}</span>
+  </div>
+
+  <article id="hero-scroll">
+    <div id="hero-content">
+    <div class="hero-spacer" id="hero-spacer">
+      <h1 class="hero-title">{data.title}</h1>
     </div>
 
+    <div class="sheet" id="hero-sheet">
+    <div class="actions">
+      <button class="start" type="button" data-cook-start>
+        <Icon name="lucide:play" size={20} />
+        {s.start}
+      </button>
+    </div>
     <div class="container">
-      <div class="actions">
-        <button class="start" type="button" data-cook-start>
-          <Icon name="lucide:play" size={20} />
-          {s.start}
-        </button>
-      </div>
-
-      <h1>{data.title}</h1>
-
       <RecipeMeta
         servings={data.servings}
         prepTime={data.prepTime}
@@ -141,9 +151,12 @@ const clientData = {
         </a>
       )}
     </div>
+    </div>
+    </div>
 
     <CookMode locale={locale} />
   </article>
+  </div>
 
   <script
     is:inline
@@ -156,6 +169,7 @@ const clientData = {
 
 <script>
   import '../../scripts/recipe-page.ts';
+  import '../../scripts/hero-parallax.ts';
 
   document.querySelector('[data-share]')?.addEventListener('click', async () => {
     const shareData = { title: document.title, url: location.href };
@@ -175,22 +189,54 @@ const clientData = {
 </script>
 
 <style>
-  article {
+  .container {
     max-width: 760px;
-    margin: 0 auto;
   }
-  .hero {
+
+  /* Non-scrolling viewport-sized scene: the document/body never scrolls,
+     so iOS Safari never rubber-bands the root — only #hero-scroll does,
+     which is a plain overflow container where touchmove preventDefault()
+     reliably works, unlike on the document body. */
+  .hero-scene {
     position: relative;
-    width: 100%;
-    height: clamp(220px, 40vh, 440px);
+    height: 100dvh;
     overflow: hidden;
-    border-radius: var(--radius-lg);
   }
-  .hero :global(img),
+
+  /* Cover photo, absolutely positioned within the non-scrolling scene so
+     the transparent spacer below lets it show through while the sheet
+     scrolls over it. */
+  .hero-photo {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 0;
+    width: 100vw;
+    height: min(calc(100vw / 1.2), 440px);
+    overflow: hidden;
+    transform-origin: top;
+    will-change: transform;
+  }
+  .hero-photo :global(img),
   .hero-fallback {
     width: 100%;
     height: 100%;
     object-fit: cover;
+  }
+
+  /* The actual scrollable pane — everything scrolls here, not on the
+     document, so the photo (a sibling, not an ancestor) stays untouched
+     by iOS's native rubber-band and is only moved by hero-parallax.ts. */
+  #hero-scroll {
+    position: absolute;
+    inset: 0;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  /* Dragged down in lockstep with the photo's scale during pull-down, so
+     the sheet stays glued to the photo's growing bottom edge (no gap). */
+  #hero-content {
+    will-change: transform;
   }
   .hero-fallback {
     display: grid;
@@ -198,9 +244,73 @@ const clientData = {
     font-size: 4rem;
     background: linear-gradient(135deg, #232526, #414345);
   }
-  .round {
+  .scrim {
     position: absolute;
-    top: 16px;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 160px;
+    background: linear-gradient(180deg, transparent, rgba(0, 0, 0, 0.55));
+  }
+
+  /* Reserves the cover's visible height in the flow; the title overlays
+     its bottom-leading corner and scrolls with the sheet, not the photo. */
+  .hero-spacer {
+    position: relative;
+    z-index: 1;
+    height: calc(min(100vw / 1.2, 440px) - 28px);
+  }
+  .hero-title {
+    position: absolute;
+    left: 20px;
+    right: 20px;
+    bottom: 12px;
+    margin: 0;
+    color: #fff;
+    font-size: 1.75rem;
+    font-weight: 800;
+    line-height: 1.15;
+    letter-spacing: -0.01em;
+    text-shadow: 0 1px 4px rgba(0, 0, 0, 0.35);
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  /* Content sheet: slides over the fixed photo as the page scrolls;
+     corner radius flattens and the top bar fades in via hero-parallax.ts. */
+  .sheet {
+    position: relative;
+    z-index: 2;
+    background: var(--bg);
+    border-radius: 28px 28px 0 0;
+  }
+
+  .topbar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: calc(env(safe-area-inset-top, 0px) + 56px);
+    padding-top: env(safe-area-inset-top, 0px);
+    background: var(--bg);
+    opacity: 0;
+  }
+  .topbar-title {
+    font-size: 1rem;
+    font-weight: 700;
+    opacity: 0;
+  }
+
+  .round {
+    position: fixed;
+    top: calc(env(safe-area-inset-top, 0px) + 16px);
+    z-index: 3;
     width: 40px;
     height: 40px;
     border: 0;
@@ -217,9 +327,10 @@ const clientData = {
     left: 16px;
   }
   .hero-actions {
-    position: absolute;
-    top: 16px;
+    position: fixed;
+    top: calc(env(safe-area-inset-top, 0px) + 16px);
     right: 16px;
+    z-index: 3;
     display: flex;
     align-items: center;
     gap: 8px;
@@ -229,11 +340,14 @@ const clientData = {
     font-size: 1rem;
   }
   .actions {
-    margin: 16px 0 8px;
-    position: relative;
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 16px 20px 8px;
   }
   .start {
-    display: inline-flex;
+    display: flex;
+    width: 100%;
+    justify-content: center;
     align-items: center;
     gap: 8px;
     border: 0;
