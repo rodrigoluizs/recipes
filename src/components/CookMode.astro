@@ -38,6 +38,9 @@ const s = t(locale);
     background: var(--bg);
     display: flex;
     flex-direction: column;
+    /* Fast taps on Next/Prev otherwise register as a double-tap, which
+       triggers the browser's zoom gesture mid-cook. */
+    touch-action: manipulation;
   }
   .cook[hidden] {
     display: none;
