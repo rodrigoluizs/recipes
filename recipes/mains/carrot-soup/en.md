@@ -32,7 +32,7 @@ method:
   - In a blender, blend the entire contents of the pot together with the 2 remaining whole chicken pieces.
   - Return the mixture to the pot and stir in the [[salt]], [[parsley]] and shredded chicken.
   - Cook for a further 5 minutes.
-image: ./carrot-soup.jpg
+image: ./carrot-soup.png
 sourceUrl: https://www.tudogostoso.com.br/receita/77880-sopa-de-cenoura.html
 tags: [soup, chicken, vegetables]
 ---

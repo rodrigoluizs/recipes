@@ -32,7 +32,7 @@ method:
   - No liquidificador, bata todo o conteúdo da panela junto com os 2 pedaços de frango inteiros restantes.
   - Volte a mistura para a panela e incorpore o [[sal]], a [[salsinha]] e o frango desfiado.
   - Cozinhe por mais 5 minutos.
-image: ./carrot-soup.jpg
+image: ./carrot-soup.png
 sourceUrl: https://www.tudogostoso.com.br/receita/77880-sopa-de-cenoura.html
 tags: [sopa, frango, legumes]
 ---
