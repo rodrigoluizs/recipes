@@ -4,6 +4,7 @@ import { Icon } from 'astro-icon/components';
 import type { RecipeEntry } from '../lib/recipes';
 import { categoryOf, recipeKeyOf } from '../lib/recipes';
 import { totalTime } from '../lib/duration';
+import { CARD_WIDTHS } from '../lib/image-sizes';
 import { localeHref } from '../lib/url';
 import { t } from '../i18n/ui';
 import type { Locale } from '../i18n/config';
@@ -54,7 +55,7 @@ const searchIngredients = recipe.data.ingredients
   <div class="media">
     {
       image ? (
-        <Image src={image} alt={title} widths={[320, 640]} sizes="(max-width: 640px) 100vw, 460px" />
+        <Image src={image} alt={title} widths={CARD_WIDTHS} sizes="(max-width: 640px) 100vw, 460px" />
       ) : (
         <div class="fallback" style={`background:linear-gradient(135deg, ${c1}, ${c2});`}>
           <span aria-hidden="true">🍽️</span>

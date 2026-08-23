@@ -14,6 +14,7 @@ import { localeOf, recipeKeyOf } from '../../lib/recipes';
 import { validateSteps } from '../../lib/references';
 import { localeHref } from '../../lib/url';
 import { recipeJsonLd } from '../../lib/structured-data';
+import { HERO_WIDTHS } from '../../lib/image-sizes';
 import { t, format } from '../../i18n/ui';
 import { LOCALES, type Locale } from '../../i18n/config';
 
@@ -110,7 +111,7 @@ const clientData = {
   <div class="hero-photo" id="hero-photo">
     {
       data.image ? (
-        <Image src={data.image} alt={data.title} widths={[480, 960]} sizes="100vw" />
+        <Image src={data.image} alt={data.title} widths={HERO_WIDTHS} sizes="100vw" />
       ) : (
         <div class="hero-fallback"><span aria-hidden="true">🍽️</span></div>
       )
