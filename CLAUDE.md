@@ -89,6 +89,26 @@ Use the `new-recipe` skill — it interviews for the fields, writes **both**
 `en.md` and `pt.md` with the correct structure, and opens a local preview
 (both languages) in the browser before any PR.
 
+## Structured data (SEO)
+
+Every recipe page automatically emits
+[schema.org/Recipe](https://schema.org/Recipe) JSON-LD (the structured data
+Google reads for Recipe rich results). It is **derived from the frontmatter at
+build time** — there is nothing to author per recipe, and no field to fill in:
+add a recipe and it gets valid structured data for free, in both locales.
+
+- Built by `src/lib/structured-data.ts` (`recipeJsonLd`), injected into the
+  `<head>` by `src/pages/[locale]/[...slug].astro` via the Base `head` slot.
+- Field mapping: `title` → `name`, `servings` → `recipeYield`, `ingredients` →
+  `recipeIngredient` (formatted lines), `method` → `recipeInstructions`
+  (`HowToStep`s, with `[[refs]]` stripped), `prepTime`/`cookTime` → ISO 8601
+  `prepTime`/`cookTime`/`totalTime`, `image` → absolute `image` URL, `tags` →
+  `keywords`, `sourceUrl` → `isBasedOn`, category folder → `recipeCategory`,
+  locale → `inLanguage`, site name → `author`. The Markdown body becomes
+  `description`. Recognised `nutrition` keys map to `NutritionInformation`.
+- Because it is frontmatter-driven, keeping the schema accurate is automatic;
+  richer output just needs richer frontmatter (add `nutrition`, `tags`, etc.).
+
 ## Development
 
 - `npm run dev` — local dev server (http://localhost:4321/recipes)

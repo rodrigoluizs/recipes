@@ -13,6 +13,7 @@ import LangToggle from '../../components/LangToggle.astro';
 import { localeOf, recipeKeyOf } from '../../lib/recipes';
 import { validateSteps } from '../../lib/references';
 import { localeHref } from '../../lib/url';
+import { recipeJsonLd } from '../../lib/structured-data';
 import { t, format } from '../../i18n/ui';
 import { LOCALES, type Locale } from '../../i18n/config';
 
@@ -46,6 +47,42 @@ const alternates = LOCALES.map((l) => ({
   url: new URL(localeHref(l, key), Astro.site).href,
 }));
 
+// schema.org/Recipe structured data for search engines (Google Rich Results).
+// Derived from the frontmatter at build time, so every recipe gets it for free.
+const category = recipe.id.split('/')[0];
+const bodyText = recipe.body
+  ?.replace(/```[\s\S]*?```/g, ' ') // fenced code
+  .replace(/!\[[^\]]*\]\([^)]*\)/g, ' ') // images
+  .replace(/\[([^\]]*)\]\([^)]*\)/g, '$1') // links -> text
+  .replace(/[#>*_`~-]/g, ' ') // markdown punctuation
+  .replace(/\s+/g, ' ')
+  .trim();
+const description = bodyText
+  ? bodyText.length > 300
+    ? `${bodyText.slice(0, 297).trimEnd()}…`
+    : bodyText
+  : undefined;
+
+const jsonLd = recipeJsonLd({
+  title: data.title,
+  description,
+  imageUrl: data.image
+    ? new URL(data.image.src, Astro.site).href
+    : undefined,
+  locale,
+  servings: data.servings,
+  prepTime: data.prepTime,
+  cookTime: data.cookTime,
+  ingredients: data.ingredients,
+  method: data.method,
+  category,
+  tags: data.tags,
+  url: new URL(localeHref(locale, key), Astro.site).href,
+  sourceUrl: data.sourceUrl,
+  nutrition: data.nutrition,
+  author: s.siteName,
+});
+
 // Payload for the client controller (scaling + popovers).
 const clientData = {
   baseServings: data.servings,
@@ -63,6 +100,12 @@ const clientData = {
 ---
 
 <Base title={data.title} locale={locale} description={data.title} alternates={alternates}>
+  <script
+    slot="head"
+    is:inline
+    type="application/ld+json"
+    set:html={JSON.stringify(jsonLd)}
+  />
   <div class="hero-scene">
   <div class="hero-photo" id="hero-photo">
     {

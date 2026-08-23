@@ -71,6 +71,27 @@ export function formatDuration(
 }
 
 /**
+ * Format whole minutes as an ISO 8601 duration (e.g. 70 -> "PT1H10M"), as
+ * required by schema.org's `prepTime`/`cookTime`/`totalTime`. Returns null for
+ * non-positive or non-finite input so callers can omit the field entirely.
+ */
+export function toISODuration(min: number): string | null {
+  if (!Number.isFinite(min) || min <= 0) return null;
+  const h = Math.floor(min / 60);
+  const m = Math.round(min % 60);
+  return `PT${h ? `${h}H` : ''}${m ? `${m}M` : ''}` || null;
+}
+
+/**
+ * Parse a free-text duration into an ISO 8601 duration string, or null when it
+ * cannot be understood. Convenience wrapper over parseDuration + toISODuration.
+ */
+export function isoDuration(input: string | null | undefined): string | null {
+  const min = parseDuration(input);
+  return min === null ? null : toISODuration(min);
+}
+
+/**
  * Total time from prep + cook. When both parse, returns a formatted sum;
  * otherwise falls back to joining the raw strings.
  */
