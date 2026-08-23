@@ -1,61 +1,23 @@
 import type { APIRoute } from 'astro';
-import { getCollection } from 'astro:content';
-import { getImage } from 'astro:assets';
-import { LOCALES } from '../i18n/config';
-import { localeOf, recipeKeyOf } from '../lib/recipes';
-import { ALL_IMAGE_WIDTHS } from '../lib/image-sizes';
 
 export const prerender = true;
 
 // Baked in at build time, so every deploy gets a fresh cache namespace and
-// activate() below purges whatever the previous deploy had cached. This is
-// safe for offline use because install() re-precaches *every* recipe (see
-// below), so the new cache is fully populated before the old one is dropped.
+// activate() below purges whatever the previous deploy had cached. This is safe
+// for offline use because install() precaches the *entire* site (every page and
+// every asset it references), so the new cache is fully populated before the old
+// one is dropped.
 const CACHE_NAME = `recipes-cache-v${Date.now()}`;
 
-const base = import.meta.env.BASE_URL.replace(/\/$/, '');
-
-/**
- * Everything worth having offline, computed at build time: the app shell (root
- * redirect + both locale feeds), every recipe page in every locale, and each
- * recipe's optimised hero image (all srcset variants). Precaching the full set
- * on install means any recipe opens offline right after installing/updating the
- * PWA — no need to have visited it first, and unaffected by the deploy purge.
- */
-async function precacheUrls(): Promise<string[]> {
-  const urls = new Set<string>([`${base}/`]);
-  for (const locale of LOCALES) urls.add(`${base}/${locale}/`);
-
-  const recipes = await getCollection('recipes');
-  const seenImages = new Set<string>();
-
-  for (const recipe of recipes) {
-    urls.add(`${base}/${localeOf(recipe.id)}/${recipeKeyOf(recipe.id)}`);
-
-    // Images are shared across locales, so optimise each source once. Generate
-    // every width set the site renders (card thumbnail + detail hero) so the
-    // emitted URLs match exactly what the feed and recipe pages request.
-    const image = recipe.data.image;
-    if (image && !seenImages.has(image.src)) {
-      seenImages.add(image.src);
-      for (const widths of ALL_IMAGE_WIDTHS) {
-        try {
-          const optimized = await getImage({ src: image, widths });
-          urls.add(optimized.src);
-          for (const variant of optimized.srcSet.values) urls.add(variant.url);
-        } catch {
-          /* optimisation failed — skip; the page itself is still cached */
-        }
-      }
-    }
-  }
-
-  return [...urls];
-}
-
-const SOURCE = (precacheUrls: string[]) => `
+// PRECACHE_URLS is a placeholder filled in after the build by
+// scripts/precache-manifest.mjs: it parses the generated HTML and lists every
+// page plus every same-origin asset each page references (CSS, JS, images,
+// icons). Doing it post-build guarantees the precache never drifts from what the
+// pages actually request — the whole reason an offline page could otherwise load
+// unstyled (its hashed CSS/JS bundle wasn't cached).
+const SOURCE = `
 const CACHE_NAME = ${JSON.stringify(CACHE_NAME)};
-const PRECACHE_URLS = ${JSON.stringify(precacheUrls)};
+const PRECACHE_URLS = [/*PRECACHE_MANIFEST*/];
 
 self.addEventListener('install', (event) => {
   event.waitUntil(
@@ -83,21 +45,34 @@ self.addEventListener('activate', (event) => {
   );
 });
 
-// Pages (HTML navigations) are network-first: always show the freshest
-// content when online, only falling back to the last cached copy when the
-// network fetch fails (offline). The \`?servings=\` scaling query is
-// stripped from the cache key — it never changes the server-rendered HTML,
-// so caching it separately would just make an older/newer copy show up
-// depending on which scale factor you last had in the URL.
+// Canonical cache key for a page (HTML navigation). Two normalisations:
+//  - Drop the \`?servings=\` scaling query — it never changes the server-rendered
+//    HTML, so caching per scale factor would just serve stale copies.
+//  - Force a trailing slash. GitHub Pages serves \`/x/\` as 200 but 301-redirects
+//    \`/x\` -> \`/x/\`; the site links to the slashless form. Keying (and fetching)
+//    the slash form keeps both the precache and the runtime cache on the clean
+//    200 — Safari refuses to serve a *redirected* response to a navigation
+//    ("Response served by service worker has redirections").
 function pageCacheKey(request) {
   const url = new URL(request.url);
   url.search = '';
+  if (!url.pathname.endsWith('/')) url.pathname += '/';
   return new Request(url.toString());
 }
 
-// Everything else (images, JS, CSS — all content-hashed by the build) is
-// cache-first: once fetched, served instantly from cache on every later
-// visit, since a changed file always gets a new hashed filename.
+// Belt-and-suspenders: if a page response ever did go through a redirect, hand
+// back a fresh non-redirected copy so the navigation doesn't get rejected.
+async function cleanPageResponse(response) {
+  if (!response || !response.redirected) return response;
+  return new Response(response.body, {
+    status: response.status,
+    statusText: response.statusText,
+    headers: response.headers,
+  });
+}
+
+// Pages are network-first: freshest content when online, cached copy when the
+// network fails (offline). Both fetch and lookup use the slash-normalised key.
 self.addEventListener('fetch', (event) => {
   const { request } = event;
   if (request.method !== 'GET') return;
@@ -108,14 +83,18 @@ self.addEventListener('fetch', (event) => {
   if (isPage) {
     const key = pageCacheKey(request);
     event.respondWith(
-      fetch(request)
-        .then((response) => {
+      fetch(key)
+        .then(async (response) => {
           if (response.ok) {
-            caches.open(CACHE_NAME).then((cache) => cache.put(key, response.clone()));
+            const cache = await caches.open(CACHE_NAME);
+            cache.put(key, response.clone());
           }
-          return response;
+          return cleanPageResponse(response);
         })
-        .catch(() => caches.open(CACHE_NAME).then((cache) => cache.match(key))),
+        .catch(async () => {
+          const cache = await caches.open(CACHE_NAME);
+          return (await cleanPageResponse(await cache.match(key))) || Response.error();
+        }),
     );
     return;
   }
@@ -132,8 +111,8 @@ self.addEventListener('fetch', (event) => {
 });
 `;
 
-export const GET: APIRoute = async () => {
-  return new Response(SOURCE(await precacheUrls()), {
+export const GET: APIRoute = () => {
+  return new Response(SOURCE, {
     headers: { 'Content-Type': 'application/javascript' },
   });
 };
