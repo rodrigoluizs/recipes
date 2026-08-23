@@ -6,7 +6,7 @@
   "description": "Personal recipe collection and website",
   "scripts": {
     "dev": "astro dev",
-    "build": "astro build",
+    "build": "astro build && node scripts/precache-manifest.mjs",
     "preview": "astro preview",
     "validate": "astro check && node scripts/validate-i18n.mjs",
     "test": "vitest run",
