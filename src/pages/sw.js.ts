@@ -1,29 +1,69 @@
 import type { APIRoute } from 'astro';
+import { getCollection } from 'astro:content';
+import { getImage } from 'astro:assets';
 import { LOCALES } from '../i18n/config';
+import { localeOf, recipeKeyOf } from '../lib/recipes';
+import { ALL_IMAGE_WIDTHS } from '../lib/image-sizes';
 
 export const prerender = true;
 
 // Baked in at build time, so every deploy gets a fresh cache namespace and
-// activate() below purges whatever the previous deploy had cached.
+// activate() below purges whatever the previous deploy had cached. This is
+// safe for offline use because install() re-precaches *every* recipe (see
+// below), so the new cache is fully populated before the old one is dropped.
 const CACHE_NAME = `recipes-cache-v${Date.now()}`;
 
-// The feed is the one page a visitor expects to always be able to get back
-// to (e.g. tapping "back" from a recipe) — precache it for both locales so
-// that works offline even on a fresh install, not just after having
-// visited it once already.
 const base = import.meta.env.BASE_URL.replace(/\/$/, '');
-const PRECACHE_URLS = LOCALES.map((locale) => `${base}/${locale}/`);
 
-const SOURCE = `
+/**
+ * Everything worth having offline, computed at build time: the app shell (root
+ * redirect + both locale feeds), every recipe page in every locale, and each
+ * recipe's optimised hero image (all srcset variants). Precaching the full set
+ * on install means any recipe opens offline right after installing/updating the
+ * PWA — no need to have visited it first, and unaffected by the deploy purge.
+ */
+async function precacheUrls(): Promise<string[]> {
+  const urls = new Set<string>([`${base}/`]);
+  for (const locale of LOCALES) urls.add(`${base}/${locale}/`);
+
+  const recipes = await getCollection('recipes');
+  const seenImages = new Set<string>();
+
+  for (const recipe of recipes) {
+    urls.add(`${base}/${localeOf(recipe.id)}/${recipeKeyOf(recipe.id)}`);
+
+    // Images are shared across locales, so optimise each source once. Generate
+    // every width set the site renders (card thumbnail + detail hero) so the
+    // emitted URLs match exactly what the feed and recipe pages request.
+    const image = recipe.data.image;
+    if (image && !seenImages.has(image.src)) {
+      seenImages.add(image.src);
+      for (const widths of ALL_IMAGE_WIDTHS) {
+        try {
+          const optimized = await getImage({ src: image, widths });
+          urls.add(optimized.src);
+          for (const variant of optimized.srcSet.values) urls.add(variant.url);
+        } catch {
+          /* optimisation failed — skip; the page itself is still cached */
+        }
+      }
+    }
+  }
+
+  return [...urls];
+}
+
+const SOURCE = (precacheUrls: string[]) => `
 const CACHE_NAME = ${JSON.stringify(CACHE_NAME)};
-const PRECACHE_URLS = ${JSON.stringify(PRECACHE_URLS)};
+const PRECACHE_URLS = ${JSON.stringify(precacheUrls)};
 
 self.addEventListener('install', (event) => {
   event.waitUntil(
-    caches
-      .open(CACHE_NAME)
-      .then((cache) => cache.addAll(PRECACHE_URLS))
-      .catch(() => {}),
+    caches.open(CACHE_NAME).then((cache) =>
+      // Cache each URL independently so one missing asset can't abort the whole
+      // precache (unlike cache.addAll, which is all-or-nothing).
+      Promise.allSettled(PRECACHE_URLS.map((url) => cache.add(url))),
+    ),
   );
   self.skipWaiting();
 });
@@ -92,8 +132,8 @@ self.addEventListener('fetch', (event) => {
 });
 `;
 
-export const GET: APIRoute = () => {
-  return new Response(SOURCE, {
+export const GET: APIRoute = async () => {
+  return new Response(SOURCE(await precacheUrls()), {
     headers: { 'Content-Type': 'application/javascript' },
   });
 };
