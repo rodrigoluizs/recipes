@@ -45,6 +45,7 @@ const serviceWorker = asset('sw.js');
         <link rel="alternate" hreflang={alt.locale} href={alt.url} />
       ))
     }
+    <slot name="head" />
   </head>
   <body>
     <slot />
