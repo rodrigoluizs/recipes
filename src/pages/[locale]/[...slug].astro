@@ -118,6 +118,9 @@ const clientData = {
     set:html={JSON.stringify(jsonLd)}
   />
   <div class="hero-scene">
+  <div id="recipe-ptr" class="recipe-ptr" aria-hidden="true">
+    <div class="ptr-spinner"></div>
+  </div>
   <div class="hero-photo" id="hero-photo">
     {
       data.image ? (
@@ -260,6 +263,47 @@ const clientData = {
     position: relative;
     height: 100dvh;
     overflow: hidden;
+  }
+
+  /* Pull-to-refresh indicator, driven by the hero pull-down gesture. */
+  .recipe-ptr {
+    position: fixed;
+    top: 0;
+    left: 50%;
+    z-index: 1000;
+    display: grid;
+    place-items: center;
+    width: 40px;
+    height: 40px;
+    margin-left: -20px;
+    border-radius: 50%;
+    background: var(--surface-2, #1a1a1a);
+    box-shadow: 0 2px 8px rgb(0 0 0 / 0.4);
+    opacity: 0;
+    transform: translateY(-56px);
+    pointer-events: none;
+  }
+  .recipe-ptr .ptr-spinner {
+    width: 18px;
+    height: 18px;
+    border: 2px solid var(--muted, #666);
+    border-top-color: var(--accent, #2e9bff);
+    border-radius: 50%;
+  }
+  .recipe-ptr.refreshing {
+    opacity: 1 !important;
+    transform: translateY(16px) !important;
+    transition:
+      transform 0.2s ease,
+      opacity 0.2s ease;
+  }
+  .recipe-ptr.refreshing .ptr-spinner {
+    animation: recipe-ptr-spin 0.7s linear infinite;
+  }
+  @keyframes recipe-ptr-spin {
+    to {
+      transform: rotate(360deg);
+    }
   }
 
   /* Cover photo, absolutely positioned within the non-scrolling scene so
