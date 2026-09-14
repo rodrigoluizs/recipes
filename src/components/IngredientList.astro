@@ -1,12 +1,18 @@
 ---
+import { Icon } from 'astro-icon/components';
 import type { Ingredient } from '../lib/types';
 import { formatQuantity } from '../lib/quantity';
+import { t } from '../i18n/ui';
+import type { Locale } from '../i18n/config';
+import { format } from '../i18n/ui';
 
 interface Props {
   ingredients: Ingredient[];
+  locale: Locale;
 }
 
-const { ingredients } = Astro.props;
+const { ingredients, locale } = Astro.props;
+const s = t(locale);
 ---
 
 <ul class="ingredients" role="list">
@@ -17,6 +23,9 @@ const { ingredients } = Astro.props;
           class="row"
           data-ing={ing.name.toLowerCase()}
           data-scalable={ing.amount !== undefined ? 'true' : undefined}
+          data-id={ing.id}
+          data-amount={ing.amount ?? undefined}
+          data-unit={ing.unit ?? undefined}
         >
           <input type="checkbox" class="tick" />
           <span class="text">
@@ -33,6 +42,14 @@ const { ingredients } = Astro.props;
             <span class="name">{ing.name}</span>
             {ing.note && <span class="note muted">{ing.note}</span>}
           </span>
+          <button
+            type="button"
+            class="add-ing"
+            data-add-ingredient
+            aria-label={format(s.addIngredientToList, { name: ing.name })}
+          >
+            <Icon name="lucide:shopping-cart" size={18} />
+          </button>
         </label>
       </li>
     ))
@@ -47,12 +64,20 @@ const { ingredients } = Astro.props;
     background: var(--surface);
     border-radius: var(--radius);
   }
+  li {
+    position: relative;
+    overflow: hidden;
+  }
   .row {
+    position: relative;
+    z-index: 1;
     display: flex;
     align-items: baseline;
     gap: 12px;
     padding: 10px 14px;
     cursor: pointer;
+    background: var(--surface);
+    touch-action: pan-y;
   }
   .tick {
     appearance: none;
@@ -76,7 +101,51 @@ const { ingredients } = Astro.props;
     line-height: 1;
   }
   .text {
+    flex: 1;
+    min-width: 0;
     font-size: 1.1rem;
+  }
+
+  /* Per-row "add this ingredient" button. Hidden by default; revealed on
+     hover / keyboard focus (desktop) and while swiping (touch). */
+  .add-ing {
+    flex: 0 0 auto;
+    align-self: center;
+    display: grid;
+    place-items: center;
+    width: 34px;
+    height: 34px;
+    margin: -6px -4px -6px 0;
+    border: 0;
+    border-radius: 50%;
+    background: transparent;
+    color: var(--accent);
+    cursor: pointer;
+    opacity: 0;
+    transition:
+      opacity 0.15s ease,
+      background 0.15s ease,
+      transform 0.15s ease;
+  }
+  .add-ing.is-added {
+    background: var(--accent);
+    color: #fff;
+    opacity: 1;
+    transform: scale(1.08);
+  }
+  @media (hover: hover) {
+    .row:hover .add-ing,
+    .row:focus-within .add-ing {
+      opacity: 1;
+    }
+  }
+  li.swiping .add-ing {
+    opacity: 1;
+  }
+  .add-ing:focus-visible {
+    opacity: 1;
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
   }
   .qty {
     font-weight: 700;
@@ -103,5 +172,9 @@ const { ingredients } = Astro.props;
   }
   :global(.picking) .row[data-scalable] .tick {
     visibility: hidden;
+  }
+  /* No single-add affordance while picking a scaling basis. */
+  :global(.picking) .add-ing {
+    display: none;
   }
 </style>

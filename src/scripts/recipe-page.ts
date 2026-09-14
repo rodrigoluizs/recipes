@@ -231,6 +231,113 @@ function init(data: RecipeClientData): void {
     }, 1600);
   });
 
+  // --- Add a single ingredient (hover button + touch swipe) ---------------
+  // Same path as the bulk add: scales by the current factor and merges by
+  // id+unit, so one line or all lines behave identically on the list.
+  function addSingle(row: HTMLElement): void {
+    const id = row.dataset.id;
+    if (!id) return;
+    const amount = row.dataset.amount ? parseFloat(row.dataset.amount) : undefined;
+    saveList(
+      addRecipeIngredients(
+        loadList(),
+        [
+          {
+            id,
+            unit: row.dataset.unit || undefined,
+            amount: amount !== undefined && !Number.isNaN(amount) ? amount : undefined,
+          },
+        ],
+        factor,
+      ),
+    );
+  }
+
+  function flashAdded(btn: HTMLElement | null): void {
+    if (!btn) return;
+    btn.classList.add('is-added');
+    window.setTimeout(() => btn.classList.remove('is-added'), 1200);
+  }
+
+  const SWIPE_THRESHOLD = 64;
+  const allIngredientRows = Array.from(
+    document.querySelectorAll<HTMLElement>('.ingredients .row'),
+  );
+  for (const rowEl of allIngredientRows) {
+    const li = rowEl.closest('li');
+    const addBtn = rowEl.querySelector<HTMLElement>('[data-add-ingredient]');
+
+    addBtn?.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      addSingle(rowEl);
+      flashAdded(addBtn);
+    });
+
+    let startX = 0;
+    let startY = 0;
+    let dx = 0;
+    let swiping = false;
+    let justSwiped = false;
+
+    rowEl.addEventListener(
+      'touchstart',
+      (e) => {
+        if (mode === 'ingredient') return; // picking a scaling basis
+        startX = e.touches[0].clientX;
+        startY = e.touches[0].clientY;
+        dx = 0;
+        swiping = false;
+        justSwiped = false;
+        rowEl.style.transition = 'none';
+      },
+      { passive: true },
+    );
+
+    rowEl.addEventListener(
+      'touchmove',
+      (e) => {
+        if (mode === 'ingredient') return;
+        const mvX = e.touches[0].clientX - startX;
+        const mvY = e.touches[0].clientY - startY;
+        if (!swiping && (Math.abs(mvX) < 10 || Math.abs(mvX) < Math.abs(mvY))) return;
+        swiping = true;
+        li?.classList.add('swiping');
+        dx = Math.min(0, mvX); // left only
+        rowEl.style.transform = `translateX(${Math.max(dx, -96)}px)`;
+      },
+      { passive: true },
+    );
+
+    function endSwipe(): void {
+      if (!swiping) return;
+      rowEl.style.transition = 'transform 0.2s ease';
+      rowEl.style.transform = '';
+      if (dx <= -SWIPE_THRESHOLD) {
+        addSingle(rowEl);
+        flashAdded(addBtn);
+      }
+      justSwiped = true;
+      swiping = false;
+      window.setTimeout(() => li?.classList.remove('swiping'), 200);
+    }
+    rowEl.addEventListener('touchend', endSwipe, { passive: true });
+    rowEl.addEventListener('touchcancel', endSwipe, { passive: true });
+
+    // A swipe must not also toggle the row's strike checkbox.
+    rowEl.addEventListener(
+      'click',
+      (e) => {
+        if (justSwiped) {
+          e.preventDefault();
+          e.stopPropagation();
+          justSwiped = false;
+        }
+      },
+      true,
+    );
+  }
+
   // --- Ingredient reference popover (page + cook mode) --------------------
   const popover = document.createElement('div');
   popover.className = 'ingredient-popover';

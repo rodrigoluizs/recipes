@@ -171,7 +171,7 @@ const clientData = {
           <button class="scale-btn accent" type="button" data-scale-toggle>{s.scale}</button>
         </div>
         <ScaleControl ingredients={data.ingredients} servings={data.servings} locale={locale} />
-        <IngredientList ingredients={data.ingredients} />
+        <IngredientList ingredients={data.ingredients} locale={locale} />
         <button class="add-to-list" type="button" data-add-to-list>
           <Icon name="lucide:shopping-cart" size={18} />
           <span data-add-to-list-label>{s.addToList}</span>
