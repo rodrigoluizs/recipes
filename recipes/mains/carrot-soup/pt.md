@@ -5,23 +5,30 @@ prepTime: 15 min
 cookTime: 1 hr 5 min
 ingredients:
   - amount: 2
+    id: carrot
     name: cenouras
     note: grandes
   - amount: 2
+    id: potato
     name: batatas
     note: médias
   - amount: 1
+    id: onion
     name: cebola
     note: média
   - amount: 2
+    id: tomato
     name: tomates
     note: sem pele e sem sementes
   - amount: 0.5
+    id: chicken-breast
     name: peito de frango
     note: com osso e com pele
-  - name: salsinha
+  - id: parsley
+    name: salsinha
     note: a gosto
-  - name: sal
+  - id: salt
+    name: sal
     note: a gosto
 method:
   - Em uma panela, pique as [[cenouras]], as [[batatas]], a [[cebola]] e os [[tomates]].

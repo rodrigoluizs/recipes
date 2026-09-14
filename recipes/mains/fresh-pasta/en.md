@@ -5,15 +5,19 @@ prepTime: 30 min
 cookTime: 3 min
 ingredients:
   - amount: 5
+    id: egg
     name: eggs
     note: organic
   - amount: 300
     unit: g
+    id: wheat-flour
     name: all-purpose flour
   - amount: 200
     unit: g
+    id: semolina
     name: fine semolina flour
-  - name: water
+  - id: water
+    name: water
     note: as needed
 method:
   - Tip the [[all-purpose flour]] and [[fine semolina flour]] onto a work surface and mix until evenly blended.

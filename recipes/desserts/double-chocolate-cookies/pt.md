@@ -6,41 +6,52 @@ cookTime: 9-11 min por fornada
 ingredients:
   - amount: 170
     unit: g
+    id: unsalted-butter
     name: manteiga sem sal
     note: amolecida em temperatura ambiente
   - amount: 150
     unit: g
+    id: brown-sugar
     name: açúcar mascavo claro
   - amount: 100
     unit: g
+    id: white-sugar
     name: açúcar refinado
   - amount: 1
+    id: egg
     name: ovo
     note: grande
   - amount: 2
     unit: col. chá
+    id: vanilla-extract
     name: extrato de baunilha
   - amount: 260
     unit: g
+    id: wheat-flour
     name: farinha de trigo
     note: Tipo 405
   - amount: 50
     unit: g
+    id: cocoa-powder
     name: cacau em pó
     note: sem açúcar
   - amount: 1
     unit: col. chá
+    id: baking-soda
     name: bicarbonato de sódio
   - amount: 0.5
     unit: col. chá
+    id: salt
     name: sal
     note: fino
   - amount: 200
     unit: g
+    id: dark-chocolate
     name: chocolate amargo
     note: 60-70%, picado grosseiramente
   - amount: 100
     unit: g
+    id: milk-chocolate
     name: chocolate ao leite
     note: picado grosseiramente
 method:

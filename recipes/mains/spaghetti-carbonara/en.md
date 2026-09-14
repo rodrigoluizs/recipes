@@ -6,21 +6,27 @@ cookTime: 20 min
 ingredients:
   - amount: 200
     unit: g
+    id: spaghetti
     name: spaghetti
   - amount: 100
     unit: g
+    id: guanciale
     name: guanciale
     note: or pancetta, cut into strips
   - amount: 3
+    id: egg
     name: eggs
   - amount: 140
     unit: g
+    id: pecorino-romano
     name: pecorino romano
     note: grated
-  - name: black pepper
+  - id: black-pepper
+    name: black pepper
     note: to taste
   - amount: 1
     unit: tbsp
+    id: coarse-salt
     name: coarse salt
     note: for the pasta water
 method:

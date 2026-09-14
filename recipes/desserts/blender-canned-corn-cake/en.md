@@ -6,34 +6,44 @@ cookTime: 40 min
 ingredients:
   - amount: 1
     unit: can
+    id: canned-corn
     name: canned corn
     note: drained
   - amount: 1
     unit: can
+    id: milk
     name: milk
     note: measured with the empty corn can
   - amount: 1
     unit: can
+    id: white-sugar
     name: sugar
     note: measured with the empty corn can
   - amount: 1
     unit: can
+    id: coarse-corn-flour
     name: coarse corn flour
     note: "flocão de milho, measured with the empty corn can"
   - amount: 0.5
     unit: can
+    id: soybean-oil
     name: soybean oil
   - amount: 3
+    id: egg
     name: eggs
   - amount: 1
     unit: tbsp
+    id: baking-powder
     name: baking powder
-  - name: margarine
+  - id: margarine
+    name: margarine
     note: for greasing the pan
-  - name: wheat flour
+  - id: wheat-flour
+    name: wheat flour
     note: for dusting the pan
   - amount: 2
     unit: tbsp
+    id: shredded-coconut
     name: shredded coconut
     note: optional
 method:

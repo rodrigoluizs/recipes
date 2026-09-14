@@ -4,6 +4,7 @@ import Base from '../../layouts/Base.astro';
 import PullToRefresh from '../../components/PullToRefresh.astro';
 import RecipeCard from '../../components/RecipeCard.astro';
 import LangToggle from '../../components/LangToggle.astro';
+import CartLink from '../../components/CartLink.astro';
 import { getRecipesByLocale, getCategories } from '../../lib/recipes';
 import { t, categoryLabel } from '../../i18n/ui';
 import { LOCALES, type Locale } from '../../i18n/config';
@@ -29,7 +30,10 @@ const alternates = LOCALES.map((l) => ({
   <main class="container">
     <div class="head">
       <h1>{s.allRecipes}</h1>
-      <LangToggle locale={locale} variant="bar" />
+      <div class="head-actions">
+        <CartLink locale={locale} variant="bar" />
+        <LangToggle locale={locale} variant="bar" />
+      </div>
     </div>
 
     <div class="search">
@@ -77,6 +81,11 @@ const alternates = LOCALES.map((l) => ({
   }
   .head h1 {
     margin: 0;
+  }
+  .head-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
   }
   .search {
     display: flex;

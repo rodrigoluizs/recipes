@@ -5,15 +5,19 @@ prepTime: 30 min
 cookTime: 3 min
 ingredients:
   - amount: 5
+    id: egg
     name: ovos
     note: orgânicos
   - amount: 300
     unit: g
+    id: wheat-flour
     name: farinha de trigo
   - amount: 200
     unit: g
+    id: semolina
     name: sêmola fina
-  - name: água
+  - id: water
+    name: água
     note: conforme necessário
 method:
   - Coloque a [[farinha de trigo]] e a [[sêmola fina]] sobre uma superfície de trabalho e misture até ficar bem homogêneo.

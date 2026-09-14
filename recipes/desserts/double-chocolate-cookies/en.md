@@ -6,41 +6,52 @@ cookTime: 9-11 min per batch
 ingredients:
   - amount: 170
     unit: g
+    id: unsalted-butter
     name: unsalted butter
     note: softened to room temperature
   - amount: 150
     unit: g
+    id: brown-sugar
     name: light brown sugar
   - amount: 100
     unit: g
+    id: white-sugar
     name: granulated sugar
   - amount: 1
+    id: egg
     name: egg
     note: large
   - amount: 2
     unit: tsp
+    id: vanilla-extract
     name: vanilla extract
   - amount: 260
     unit: g
+    id: wheat-flour
     name: all-purpose flour
     note: Type 405
   - amount: 50
     unit: g
+    id: cocoa-powder
     name: cocoa powder
     note: unsweetened
   - amount: 1
     unit: tsp
+    id: baking-soda
     name: baking soda
   - amount: 0.5
     unit: tsp
+    id: salt
     name: salt
     note: fine
   - amount: 200
     unit: g
+    id: dark-chocolate
     name: dark chocolate
     note: 60-70%, roughly chopped
   - amount: 100
     unit: g
+    id: milk-chocolate
     name: milk chocolate
     note: roughly chopped
 method:

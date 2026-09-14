@@ -6,21 +6,27 @@ cookTime: 20 min
 ingredients:
   - amount: 200
     unit: g
+    id: spaghetti
     name: espaguete
   - amount: 100
     unit: g
+    id: guanciale
     name: guanciale
     note: ou pancetta, cortado em tiras
   - amount: 3
+    id: egg
     name: ovos
   - amount: 140
     unit: g
+    id: pecorino-romano
     name: pecorino romano
     note: ralado
-  - name: pimenta preta
+  - id: black-pepper
+    name: pimenta preta
     note: a gosto
   - amount: 1
     unit: colher de sopa
+    id: coarse-salt
     name: sal grosso
     note: para a água do macarrão
 method:

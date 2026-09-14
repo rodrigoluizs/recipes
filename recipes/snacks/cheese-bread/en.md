@@ -6,33 +6,41 @@ cookTime: 25–30 min
 ingredients:
   - amount: 250
     unit: g
+    id: semi-cured-cheese
     name: semi-cured cheese
     note: grated (about 2 cups)
   - amount: 85
     unit: g
+    id: parmesan
     name: parmesan cheese
     note: grated (about ½ cup)
   - amount: 50
     unit: g
+    id: oil
     name: oil
     note: about 4 tbsp
   - amount: 200
     unit: g
+    id: milk
     name: milk
     note: about 1 cup
   - amount: 250
     unit: g
+    id: sour-cassava-starch
     name: sour cassava starch
     note: polvilho azedo (about 2 cups)
   - amount: 85
     unit: g
+    id: sweet-cassava-starch
     name: sweet cassava starch
     note: polvilho doce (about ½ cup)
   - amount: 6
     unit: g
+    id: salt
     name: salt
     note: or two generous pinches
   - amount: 2
+    id: egg
     name: egg
     note: whole
 method:

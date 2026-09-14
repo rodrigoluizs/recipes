@@ -6,25 +6,32 @@ cookTime: 30 min
 ingredients:
   - amount: 250
     unit: g
+    id: bucatini
     name: bucatini
   - amount: 75
     unit: g
+    id: guanciale
     name: guanciale
     note: ou pancetta, cortado em cubos
   - amount: 400
     unit: g
+    id: peeled-tomatoes
     name: tomate pelado
     note: enlatado
   - amount: 5
     unit: l
+    id: water
     name: água
     note: para cozinhar o macarrão
-  - name: sal
+  - id: salt
+    name: sal
     note: a gosto
-  - name: pimenta
+  - id: black-pepper
+    name: pimenta
     note: a gosto
   - amount: 1
     unit: copo
+    id: white-wine
     name: vinho branco
 method:
   - Corte o [[guanciale]] em cubos, mantendo a gordura.

@@ -6,20 +6,25 @@ cookTime: 20 min
 ingredients:
   - amount: 200
     unit: g
+    id: white-rice
     name: arroz branco
   - amount: 480
     unit: ml
+    id: water
     name: água
   - amount: 1
     unit: colher de sopa
+    id: olive-oil
     name: azeite de oliva
     note: ou óleo vegetal
   - amount: 2
     unit: dente
+    id: garlic
     name: alho
     note: picado ou amassado
   - amount: 1
     unit: colher de chá
+    id: salt
     name: sal
     note: ou a gosto
 method:

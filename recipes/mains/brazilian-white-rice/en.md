@@ -6,20 +6,25 @@ cookTime: 20 min
 ingredients:
   - amount: 200
     unit: g
+    id: white-rice
     name: white rice
   - amount: 480
     unit: ml
+    id: water
     name: water
   - amount: 1
     unit: tbsp
+    id: olive-oil
     name: olive oil
     note: or vegetable oil
   - amount: 2
     unit: clove
+    id: garlic
     name: garlic
     note: minced or crushed
   - amount: 1
     unit: tsp
+    id: salt
     name: salt
     note: or to taste
 method:

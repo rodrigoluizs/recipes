@@ -1,6 +1,7 @@
 import { defineCollection } from 'astro:content';
 import { z } from 'astro/zod';
 import { glob } from 'astro/loaders';
+import { isIngredientId } from './data/ingredients';
 
 /**
  * Recipes live as `recipes/<category>/<slug>/<locale>.md` (e.g.
@@ -24,6 +25,10 @@ const recipes = defineCollection({
       ingredients: z
         .array(
           z.object({
+            id: z.string().refine(isIngredientId, {
+              message:
+                'unknown ingredient id — add it to src/data/ingredients.ts',
+            }),
             amount: z.number().optional(),
             unit: z.string().optional(),
             name: z.string(),

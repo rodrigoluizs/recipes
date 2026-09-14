@@ -8,9 +8,9 @@ const base: RecipeSchemaInput = {
   prepTime: '20 min',
   cookTime: '30 min',
   ingredients: [
-    { amount: 200, unit: 'g', name: 'dark chocolate' },
-    { amount: 3, name: 'eggs' },
-    { name: 'salt', note: 'to taste' },
+    { id: 'dark-chocolate', amount: 200, unit: 'g', name: 'dark chocolate' },
+    { id: 'egg', amount: 3, name: 'eggs' },
+    { id: 'salt', name: 'salt', note: 'to taste' },
   ],
   method: ['Melt the [[dark chocolate]].', 'Whisk the [[eggs]].'],
 };

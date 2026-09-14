@@ -1,0 +1,68 @@
+---
+import { Icon } from 'astro-icon/components';
+import { t } from '../i18n/ui';
+import type { Locale } from '../i18n/config';
+import { localeHref } from '../lib/url';
+
+interface Props {
+  locale: Locale;
+  /** `bar` for the light in-page header; `overlay` for the dark hero corner. */
+  variant?: 'bar' | 'overlay';
+}
+
+const { locale, variant = 'bar' } = Astro.props;
+const s = t(locale);
+---
+
+<a
+  class:list={['cart', variant]}
+  href={localeHref(locale, 'shopping-list')}
+  aria-label={s.cartAriaLabel}
+>
+  <Icon name="lucide:shopping-cart" size={20} />
+  <span class="badge" data-cart-count hidden aria-hidden="true"></span>
+</a>
+
+<style>
+  .cart {
+    position: relative;
+    display: grid;
+    place-items: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    color: var(--fg);
+    flex: 0 0 auto;
+  }
+  .cart.bar {
+    background: var(--surface);
+  }
+  .cart.overlay {
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(6px);
+    color: #fff;
+  }
+  .badge {
+    position: absolute;
+    top: -4px;
+    right: -4px;
+    min-width: 18px;
+    height: 18px;
+    padding: 0 5px;
+    border-radius: 9px;
+    background: var(--accent);
+    color: #fff;
+    font-size: 0.72rem;
+    font-weight: 700;
+    line-height: 18px;
+    text-align: center;
+  }
+  .badge[hidden] {
+    display: none;
+  }
+</style>
+
+<script>
+  import { initCartBadges } from '../scripts/shopping-store';
+  initCartBadges();
+</script>

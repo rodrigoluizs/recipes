@@ -5,23 +5,30 @@ prepTime: 15 min
 cookTime: 1 hr 5 min
 ingredients:
   - amount: 2
+    id: carrot
     name: carrots
     note: large
   - amount: 2
+    id: potato
     name: potatoes
     note: medium
   - amount: 1
+    id: onion
     name: onion
     note: medium
   - amount: 2
+    id: tomato
     name: tomatoes
     note: peeled and deseeded
   - amount: 0.5
+    id: chicken-breast
     name: chicken breast
     note: bone-in, skin-on
-  - name: parsley
+  - id: parsley
+    name: parsley
     note: to taste
-  - name: salt
+  - id: salt
+    name: salt
     note: to taste
 method:
   - In a pot, chop the [[carrots]], [[potatoes]], [[onion]] and [[tomatoes]].

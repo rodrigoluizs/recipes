@@ -6,34 +6,44 @@ cookTime: 40 min
 ingredients:
   - amount: 1
     unit: lata
+    id: canned-corn
     name: milho em lata
     note: sem o líquido
   - amount: 1
     unit: lata
+    id: milk
     name: leite
     note: medida da lata de milho
   - amount: 1
     unit: lata
+    id: white-sugar
     name: açúcar
     note: medida da lata de milho
   - amount: 1
     unit: lata
+    id: coarse-corn-flour
     name: flocão de milho
     note: medida da lata de milho
   - amount: 0.5
     unit: lata
+    id: soybean-oil
     name: óleo de soja
   - amount: 3
+    id: egg
     name: ovos
   - amount: 1
     unit: colher de sopa
+    id: baking-powder
     name: fermento em pó
-  - name: margarina
+  - id: margarine
+    name: margarina
     note: para untar
-  - name: farinha de trigo
+  - id: wheat-flour
+    name: farinha de trigo
     note: para untar
   - amount: 2
     unit: colher de sopa
+    id: shredded-coconut
     name: coco ralado
     note: opcional
 method:

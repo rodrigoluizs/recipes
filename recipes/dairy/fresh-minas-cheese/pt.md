@@ -6,19 +6,24 @@ cookTime: 45 min
 ingredients:
   - amount: 7
     unit: l
+    id: whole-milk
     name: leite integral pasteurizado
     note: 3,8% de gordura
   - amount: 100
     unit: g
+    id: salt
     name: sal (leite)
   - amount: 2
     unit: ml
+    id: calcium-chloride
     name: cloridrato de cálcio
   - amount: 2
     unit: ml
+    id: liquid-rennet
     name: coagulante líquido
   - amount: 80
     unit: g
+    id: salt
     name: sal (massa)
 method:
   - Em uma panela bem grande, coloque o [[leite integral pasteurizado]] e o [[sal (leite)]].
