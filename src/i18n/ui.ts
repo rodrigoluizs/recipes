@@ -53,6 +53,7 @@ export interface UIStrings {
   shoppingList: string;
   addToList: string;
   addedToList: string;
+  addIngredientToList: string; // "Add {name} to shopping list" — {name}
   cartAriaLabel: string;
   shoppingListEmpty: string;
   alreadyHaveHint: string;
@@ -108,6 +109,7 @@ export const ui: Record<Locale, UIStrings> = {
     shoppingList: 'Shopping list',
     addToList: 'Add to list',
     addedToList: 'Added',
+    addIngredientToList: 'Add {name} to shopping list',
     cartAriaLabel: 'Shopping list',
     shoppingListEmpty:
       'Your shopping list is empty. Open a recipe and tap “Add to list”, or add an item below.',
@@ -162,6 +164,7 @@ export const ui: Record<Locale, UIStrings> = {
     shoppingList: 'Lista de compras',
     addToList: 'Adicionar à lista',
     addedToList: 'Adicionado',
+    addIngredientToList: 'Adicionar {name} à lista de compras',
     cartAriaLabel: 'Lista de compras',
     shoppingListEmpty:
       'Sua lista de compras está vazia. Abra uma receita e toque em “Adicionar à lista”, ou adicione um item abaixo.',
