@@ -56,6 +56,8 @@
 </style>
 
 <script>
+  import { hardRefresh } from '../scripts/hard-refresh';
+
   const isStandalone =
     (window.navigator as any).standalone === true ||
     window.matchMedia('(display-mode: standalone)').matches;
@@ -115,7 +117,7 @@
       const delta = e.changedTouches[0].clientY - startY;
       if (delta >= THRESHOLD) {
         el.classList.add('refreshing');
-        setTimeout(() => window.location.reload(), 150);
+        setTimeout(() => hardRefresh(), 150);
       } else {
         reset();
       }
