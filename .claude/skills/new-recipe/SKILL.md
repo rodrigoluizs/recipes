@@ -18,10 +18,31 @@ and let the user preview it live before any commit/PR.
   identical across languages — only the human-readable text changes.
 - Every recipe file MUST have: `title`, `servings`, `prepTime`, `cookTime`,
   `ingredients` (>= 1), `method` (>= 1).
-- Ingredients are structured: `{ amount?, unit?, name, note? }`.
+- Ingredients are structured: `{ id, amount?, unit?, name, note? }`.
+  - `id` is a **required** canonical ingredient id from `src/data/ingredients.ts`
+    (locale-neutral; the same across `en.md`/`pt.md`). It ties the ingredient to
+    a shared identity so the shopping list can sum quantities across recipes and
+    languages. See the ingredient-id rules below.
   - `amount` is a number; omit it for non-scalable items ("to taste").
   - `unit` is optional ("g", "ml", "tsp"); omit for countable items (eggs).
   - `note` is a muted clarifier shown after the name ("grated", "to taste").
+
+### Ingredient ids
+
+- For each ingredient, **reuse an existing id** from `src/data/ingredients.ts`
+  when it is genuinely the same product. Search the DB first (by the EN or PT
+  name) before inventing one.
+- If none fits, **add a new entry** to `src/data/ingredients.ts` with the
+  canonical `en` and `pt` names, then reference its id. Keep the object sorted by
+  id and cover both locales (TypeScript enforces this).
+- **Never conflate near-duplicates.** Things a shopper buys separately get
+  separate ids: `milk` vs `whole-milk`, `salt` vs `coarse-salt`, `baking-powder`
+  (fermento em pó) vs `dry-yeast` (fermento seco), `tomato-passata` vs
+  `tomato-sauce`, `white-sugar` vs `brown-sugar`. When unsure whether two are the
+  same product, prefer a new id.
+- The same id may appear twice in one recipe (e.g. `salt` used at two stages);
+  that is fine — they merge on the shopping list.
+- `npm run validate` fails if any `id` is missing or not present in the DB.
 - In `method` steps, reference an ingredient with `[[name]]` where `name`
   matches an ingredient's `name` exactly (case-insensitive) **in that same
   file**. Since ingredient names are translated, the `[[refs]]` in `pt.md` must
@@ -34,7 +55,9 @@ and let the user preview it live before any commit/PR.
 1. **Interview** the user, one topic at a time, to collect:
    - Title, and category (an existing folder under `recipes/` or a new one).
    - Servings (integer), prep time, cook time (free text like "40 min").
-   - Ingredients (amount / unit / name / optional note).
+   - Ingredients (amount / unit / name / optional note). For each, resolve a
+     canonical `id` — reuse from `src/data/ingredients.ts` or add a new entry
+     (see the ingredient-id rules above).
    - Method steps. Offer to add `[[name]]` references for ingredients used.
    - Optional: photo, source URL (`sourceUrl`), tags, nutrition, body notes.
 
@@ -84,11 +107,13 @@ servings: <number>
 prepTime: <e.g. 20 min>
 cookTime: <e.g. 30 min>
 ingredients:
-  - amount: <number>
+  - id: <ingredient-id>     # from src/data/ingredients.ts (required)
+    amount: <number>
     unit: <unit>            # omit if none
     name: <name>
     note: <clarifier>       # omit if none
-  - name: <name>            # non-scalable item
+  - id: <ingredient-id>     # non-scalable item
+    name: <name>
     note: to taste
 method:
   - <Step, referencing ingredients like [[name]].>

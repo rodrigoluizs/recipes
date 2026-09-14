@@ -6,27 +6,36 @@ cookTime: 5–10 min per pizza
 ingredients:
   - amount: 600
     unit: ml
+    id: water
     name: water
     note: room temperature
   - amount: 1000
     unit: g
+    id: 00-pizza-flour
     name: 00 pizza flour
     note: such as Le 5 Stagioni Pizza Napoletana
   - amount: 30
     unit: g
+    id: salt
     name: fine sea salt
   - amount: 1
     unit: g
+    id: dry-yeast
     name: dry yeast
-  - name: semolina
+  - id: semolina
+    name: semolina
     note: refined, for dusting
-  - name: tomato sauce
+  - id: tomato-sauce
+    name: tomato sauce
     note: per pizza
-  - name: mozzarella
+  - id: mozzarella
+    name: mozzarella
     note: fresh, sliced
-  - name: basil
+  - id: basil
+    name: basil
     note: fresh leaves
-  - name: olive oil
+  - id: olive-oil
+    name: olive oil
     note: extra virgin, for drizzling
 method:
   - "Activate the yeast: add the [[water]] to the mixer bowl, sprinkle in the [[dry yeast]], stir briefly, and let it dissolve for about 1 minute."

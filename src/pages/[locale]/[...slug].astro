@@ -10,6 +10,7 @@ import MethodSteps from '../../components/MethodSteps.astro';
 import ScaleControl from '../../components/ScaleControl.astro';
 import CookMode from '../../components/CookMode.astro';
 import LangToggle from '../../components/LangToggle.astro';
+import CartLink from '../../components/CartLink.astro';
 import { localeOf, recipeKeyOf } from '../../lib/recipes';
 import { validateSteps } from '../../lib/references';
 import { localeHref } from '../../lib/url';
@@ -90,12 +91,21 @@ const clientData = {
   ingredients: Object.fromEntries(
     data.ingredients.map((i) => [i.name.toLowerCase(), i]),
   ),
+  // Flat list (ids + base amounts) used by "Add to list" — an array, not the
+  // name-keyed record above, so nothing is lost if two lines share a name.
+  shoppingItems: data.ingredients.map((i) => ({
+    id: i.id,
+    unit: i.unit,
+    amount: i.amount,
+  })),
   t: {
     servings: s.servings,
     select: s.select,
     stepOf: s.stepOf,
     next: s.next,
     done: s.done,
+    addToList: s.addToList,
+    addedToList: s.addedToList,
   },
 };
 ---
@@ -123,6 +133,7 @@ const clientData = {
     <Icon name="lucide:chevron-left" size={24} />
   </a>
   <div class="hero-actions">
+    <CartLink locale={locale} variant="overlay" />
     <LangToggle locale={locale} path={key} variant="overlay" />
     <button class="round share" type="button" data-share aria-label={s.shareRecipe}>
       <Icon name="lucide:share" size={20} />
@@ -161,6 +172,10 @@ const clientData = {
         </div>
         <ScaleControl ingredients={data.ingredients} servings={data.servings} locale={locale} />
         <IngredientList ingredients={data.ingredients} />
+        <button class="add-to-list" type="button" data-add-to-list>
+          <Icon name="lucide:shopping-cart" size={18} />
+          <span data-add-to-list-label>{s.addToList}</span>
+        </button>
       </section>
 
       <section>
@@ -420,6 +435,25 @@ const clientData = {
     border-radius: var(--radius-pill);
     font-weight: 700;
     font-size: 1rem;
+  }
+  .add-to-list {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+    margin-top: 12px;
+    padding: 12px 20px;
+    border: 0;
+    border-radius: var(--radius-pill);
+    background: var(--surface);
+    color: var(--accent);
+    font-size: 1.05rem;
+    font-weight: 700;
+  }
+  .add-to-list.is-added {
+    background: var(--accent);
+    color: #fff;
   }
   .note {
     margin: 0 0 10px;

@@ -19,3 +19,6 @@ yarn-error.log*
 
 # design/spec docs (kept local, not versioned in this repo)
 docs/superpowers/
+
+# Local git worktrees
+.claude/worktrees/

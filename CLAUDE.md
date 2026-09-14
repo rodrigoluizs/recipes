@@ -31,7 +31,8 @@ Every recipe file MUST contain:
 - **Servings** — `servings` (integer)
 - **Prep Time** — `prepTime` (free text, e.g. `20 min`)
 - **Cook Time** — `cookTime` (free text, e.g. `1 hr 10 min`)
-- **Ingredients** — `ingredients` (list, >= 1)
+- **Ingredients** — `ingredients` (list, >= 1); each needs a canonical `id`
+  (see Ingredient shape below)
 - **Method** — `method` (list of steps, >= 1)
 
 Optional:
@@ -46,11 +47,22 @@ Optional:
 Each ingredient is structured so quantities can be scaled and referenced:
 
 ```yaml
-- amount: 250      # number; omit for non-scalable items ("to taste")
-  unit: g          # optional; omit for countable items (eggs)
-  name: cheese     # required; referenced from steps via [[cheese]]
-  note: grated     # optional muted clarifier shown after the name
+- id: semi-cured-cheese  # required; canonical id from src/data/ingredients.ts
+  amount: 250            # number; omit for non-scalable items ("to taste")
+  unit: g                # optional; omit for countable items (eggs)
+  name: cheese           # required; referenced from steps via [[cheese]]
+  note: grated           # optional muted clarifier shown after the name
 ```
+
+The `id` is a **locale-neutral canonical ingredient id** (identical in `en.md`
+and `pt.md`) defined in `src/data/ingredients.ts`, which maps each id to its
+display name per locale. It is the shared identity the shopping list uses to
+sum quantities across recipes and languages, so `cebola` (pt) and `onion` (en)
+both carry `id: onion` and merge. Reuse an existing id when it is truly the same
+product; otherwise add a new DB entry (both locales). **Never conflate
+near-duplicates** — things bought separately get separate ids (`milk` vs
+`whole-milk`, `baking-powder` vs `dry-yeast`, `salt` vs `coarse-salt`). The
+`new-recipe` skill enforces this; `npm run validate` fails on an unknown id.
 
 ### Method references
 
@@ -69,10 +81,12 @@ servings: 12
 prepTime: 20 min
 cookTime: 30 min
 ingredients:
-  - amount: 200
+  - id: dark-chocolate
+    amount: 200
     unit: g
     name: dark chocolate
-  - amount: 3
+  - id: egg
+    amount: 3
     name: eggs
 method:
   - Melt the [[dark chocolate]].
@@ -88,6 +102,26 @@ Optional notes.
 Use the `new-recipe` skill — it interviews for the fields, writes **both**
 `en.md` and `pt.md` with the correct structure, and opens a local preview
 (both languages) in the browser before any PR.
+
+## Shopping list
+
+Visitors can add a recipe's ingredients to a shopping list (cart icon in the
+home header and the recipe hero → `/<locale>/shopping-list`).
+
+- **Client-side only.** State lives in `localStorage` (`recipes:shopping-list`,
+  versioned `{ v: 1, items }`) — no backend — and works offline in the PWA
+  (the page is auto-precached by `scripts/precache-manifest.mjs`).
+- **Merging by canonical id.** Adding uses the recipe's current scale as a
+  snapshot; lines with the same ingredient `id` **and** `unit` sum their
+  amounts, so the same ingredient across recipes/languages collapses to one
+  line. Different units of one id stay as separate lines. Names shown come from
+  `src/data/ingredients.ts` in the viewer's locale.
+- **Free-text items.** Users can add manual items (not from any recipe); these
+  never merge with recipe lines.
+- **Interaction.** Tap to mark "already have" (strike, reversible), the `✕` to
+  remove a line, plus *Clear checked* and *Empty list*.
+- Pure logic in `src/lib/shopping-list.ts` (unit-tested); storage/DOM glue in
+  `src/scripts/shopping-store.ts` and `src/scripts/shopping-list-page.ts`.
 
 ## Structured data (SEO)
 

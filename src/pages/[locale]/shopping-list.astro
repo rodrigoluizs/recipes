@@ -1,0 +1,243 @@
+---
+import { Icon } from 'astro-icon/components';
+import Base from '../../layouts/Base.astro';
+import LangToggle from '../../components/LangToggle.astro';
+import { INGREDIENTS, ingredientName } from '../../data/ingredients';
+import { localeHref } from '../../lib/url';
+import { t } from '../../i18n/ui';
+import { LOCALES, type Locale } from '../../i18n/config';
+
+export async function getStaticPaths() {
+  return LOCALES.map((locale) => ({ params: { locale } }));
+}
+
+const locale = Astro.params.locale as Locale;
+const s = t(locale);
+
+// Every canonical id resolved to its name in this locale, so the client can
+// label any item the stored list contains without shipping the whole DB logic.
+const names = Object.fromEntries(
+  Object.keys(INGREDIENTS).map((id) => [id, ingredientName(id, locale)]),
+);
+
+const pageData = {
+  names,
+  t: {
+    empty: s.shoppingListEmpty,
+    hint: s.alreadyHaveHint,
+    confirmEmpty: s.confirmEmptyList,
+  },
+};
+
+const alternates = LOCALES.map((l) => ({
+  locale: l,
+  url: new URL(localeHref(l, 'shopping-list'), Astro.site).href,
+}));
+---
+
+<Base title={s.shoppingList} locale={locale} alternates={alternates}>
+  <main class="container">
+    <div class="head">
+      <a class="back" href={localeHref(locale)} aria-label={s.backToRecipes}>
+        <Icon name="lucide:chevron-left" size={24} />
+      </a>
+      <h1>{s.shoppingList}</h1>
+      <LangToggle locale={locale} path="shopping-list" variant="bar" />
+    </div>
+
+    <p class="hint" id="list-hint" hidden>{s.alreadyHaveHint}</p>
+
+    <ul class="list" id="list" role="list"></ul>
+
+    <p class="empty" id="empty">{s.shoppingListEmpty}</p>
+
+    <form class="manual" id="manual-form">
+      <input
+        id="manual-input"
+        type="text"
+        placeholder={s.manualItemPlaceholder}
+        aria-label={s.manualItemPlaceholder}
+        autocomplete="off"
+      />
+      <button type="submit">{s.addItem}</button>
+    </form>
+
+    <div class="actions" id="actions" hidden>
+      <button type="button" class="ghost" data-clear-checked>{s.clearChecked}</button>
+      <button type="button" class="ghost danger" data-empty-list>{s.emptyListAction}</button>
+    </div>
+  </main>
+
+  <script
+    is:inline
+    type="application/json"
+    id="shopping-data"
+    set:html={JSON.stringify(pageData)}
+  />
+</Base>
+
+<script>
+  import '../../scripts/shopping-list-page.ts';
+</script>
+
+<style>
+  .container {
+    max-width: 760px;
+    padding-bottom: 40px;
+  }
+  .head {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .head h1 {
+    margin: 0;
+    flex: 1;
+    font-size: 1.6rem;
+  }
+  .back {
+    display: grid;
+    place-items: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: var(--surface);
+    color: var(--fg);
+    flex: 0 0 auto;
+  }
+  .hint {
+    color: var(--muted);
+    font-size: 0.95rem;
+    margin: 16px 0 8px;
+  }
+  .hint[hidden] {
+    display: none;
+  }
+
+  .list {
+    list-style: none;
+    margin: 8px 0;
+    padding: 8px 4px;
+    background: var(--surface);
+    border-radius: var(--radius);
+  }
+  .list:empty {
+    display: none;
+  }
+  .list :global(li) {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 14px;
+  }
+  .list :global(.tick) {
+    appearance: none;
+    width: 22px;
+    height: 22px;
+    border: 2px solid var(--muted);
+    border-radius: 6px;
+    flex: 0 0 auto;
+    display: grid;
+    place-items: center;
+    cursor: pointer;
+  }
+  .list :global(.tick:checked) {
+    background: var(--accent);
+    border-color: var(--accent);
+  }
+  .list :global(.tick:checked::after) {
+    content: '✓';
+    color: #fff;
+    font-size: 14px;
+    line-height: 1;
+  }
+  .list :global(.body) {
+    flex: 1;
+    font-size: 1.1rem;
+    min-width: 0;
+  }
+  .list :global(.qty) {
+    font-weight: 700;
+    color: var(--accent);
+    margin-right: 6px;
+  }
+  .list :global(li.checked .body) {
+    text-decoration: line-through;
+    color: var(--muted);
+  }
+  .list :global(li.checked .qty) {
+    color: var(--muted);
+  }
+  .list :global(.remove) {
+    flex: 0 0 auto;
+    border: 0;
+    background: none;
+    color: var(--muted);
+    display: grid;
+    place-items: center;
+    padding: 6px;
+    cursor: pointer;
+  }
+
+  .empty {
+    color: var(--muted);
+    text-align: center;
+    padding: 32px 8px;
+  }
+  .empty[hidden] {
+    display: none;
+  }
+
+  .manual {
+    display: flex;
+    gap: 8px;
+    margin-top: 16px;
+  }
+  .manual input {
+    flex: 1;
+    min-width: 0;
+    border: 0;
+    background: var(--surface);
+    color: var(--fg);
+    border-radius: var(--radius-pill);
+    padding: 0 18px;
+    height: 48px;
+    font-size: 1.05rem;
+    outline: none;
+  }
+  .manual input::placeholder {
+    color: var(--muted);
+  }
+  .manual button {
+    flex: 0 0 auto;
+    border: 0;
+    background: var(--accent);
+    color: #fff;
+    border-radius: var(--radius-pill);
+    padding: 0 22px;
+    font-size: 1.05rem;
+    font-weight: 700;
+    cursor: pointer;
+  }
+
+  .actions {
+    display: flex;
+    gap: 12px;
+    margin-top: 24px;
+  }
+  .actions[hidden] {
+    display: none;
+  }
+  .ghost {
+    border: 0;
+    background: none;
+    color: var(--accent);
+    font-weight: 600;
+    font-size: 0.95rem;
+    padding: 8px 0;
+    cursor: pointer;
+  }
+  .ghost.danger {
+    color: #ff6b6b;
+  }
+</style>

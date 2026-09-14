@@ -1,6 +1,9 @@
 import { scaleAmount, formatQuantity, roundNice } from '../lib/quantity';
+import { addRecipeIngredients } from '../lib/shopping-list';
+import { loadList, saveList } from './shopping-store';
 
 interface ClientIngredient {
+  id: string;
   amount?: number;
   unit?: string;
   name: string;
@@ -15,18 +18,28 @@ interface ClientStrings {
   stepOf: string;
   next: string;
   done: string;
+  addToList: string;
+  addedToList: string;
+}
+
+interface ShoppingItem {
+  id: string;
+  unit?: string;
+  amount?: number;
 }
 
 interface RecipeClientData {
   baseServings: number;
   /** Keyed by lowercased ingredient name. */
   ingredients: Record<string, ClientIngredient>;
+  /** Flat list used by "Add to list" (nothing lost to name collisions). */
+  shoppingItems: ShoppingItem[];
   t: ClientStrings;
 }
 
 type Mode = 'amount' | 'serving' | 'ingredient';
 
-const MIN_FACTOR = 0.25;
+const MIN_FACTOR = 0.5;
 const MAX_FACTOR = 8;
 
 const dataEl = document.getElementById('recipe-data');
@@ -202,6 +215,21 @@ function init(data: RecipeClientData): void {
   document
     .querySelector('[data-scale-reset]')
     ?.addEventListener('click', () => applyScale(1));
+
+  // --- Add to shopping list (snapshots the current scale) -----------------
+  const addBtn = document.querySelector<HTMLButtonElement>('[data-add-to-list]');
+  const addLabel = addBtn?.querySelector<HTMLElement>('[data-add-to-list-label]');
+  let addedResetTimer: number | undefined;
+  addBtn?.addEventListener('click', () => {
+    saveList(addRecipeIngredients(loadList(), data.shoppingItems, factor));
+    addBtn.classList.add('is-added');
+    if (addLabel) addLabel.textContent = strings.addedToList;
+    window.clearTimeout(addedResetTimer);
+    addedResetTimer = window.setTimeout(() => {
+      addBtn.classList.remove('is-added');
+      if (addLabel) addLabel.textContent = strings.addToList;
+    }, 1600);
+  });
 
   // --- Ingredient reference popover (page + cook mode) --------------------
   const popover = document.createElement('div');

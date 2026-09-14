@@ -6,33 +6,41 @@ cookTime: 25-30 min
 ingredients:
   - amount: 250
     unit: g
+    id: semi-cured-cheese
     name: queijo meia cura
     note: ralado (cerca de 2 xícaras)
   - amount: 85
     unit: g
+    id: parmesan
     name: queijo parmesão
     note: ralado (cerca de ½ xícara)
   - amount: 50
     unit: g
+    id: oil
     name: óleo
     note: cerca de 4 col. sopa
   - amount: 200
     unit: g
+    id: milk
     name: leite
     note: cerca de 1 xícara
   - amount: 250
     unit: g
+    id: sour-cassava-starch
     name: polvilho azedo
     note: cerca de 2 xícaras
   - amount: 85
     unit: g
+    id: sweet-cassava-starch
     name: polvilho doce
     note: cerca de ½ xícara
   - amount: 6
     unit: g
+    id: salt
     name: sal
     note: ou duas pitadas generosas
   - amount: 2
+    id: egg
     name: ovo
     note: inteiro
 method:

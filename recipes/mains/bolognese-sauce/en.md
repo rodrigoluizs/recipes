@@ -5,45 +5,59 @@ prepTime: 20 min
 cookTime: 4 hr 30 min
 ingredients:
   - amount: 1
+    id: onion
     name: onion
     note: large, finely chopped
   - amount: 3
+    id: celery
     name: celery
     note: stalks, finely chopped
   - amount: 3
+    id: carrot
     name: carrots
     note: large, halved lengthwise and sliced
-  - name: salt
+  - id: salt
+    name: salt
     note: to taste
-  - name: pepper
+  - id: black-pepper
+    name: pepper
     note: to taste
   - amount: 150
     unit: g
+    id: tomato-paste
     name: tomato paste
   - amount: 400
     unit: g
+    id: peeled-tomatoes
     name: peeled tomatoes
     note: canned
   - amount: 1
     unit: l
+    id: tomato-passata
     name: tomato passata
-  - name: olive oil
+  - id: olive-oil
+    name: olive oil
     note: extra virgin, generous amount
   - amount: 250
     unit: ml
+    id: red-wine
     name: red wine
   - amount: 300
     unit: ml
+    id: milk
     name: milk
     note: about 1 mug
   - amount: 1000
     unit: g
+    id: ground-beef
     name: ground beef
   - amount: 1
     unit: l
+    id: water
     name: hot water
   - amount: 0.5
     unit: l
+    id: water
     name: extra water
     note: only if the sauce dries out
 method:

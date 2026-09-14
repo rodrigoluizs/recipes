@@ -6,25 +6,31 @@ cookTime: 1 hr 50 min
 ingredients:
   - amount: 760
     unit: g
+    id: condensed-milk
     name: sweetened condensed milk
     note: 2 cans, 380 g each
   - amount: 520
     unit: ml
+    id: whole-milk
     name: whole milk
     note: about 1.5 cans, a finger short of full
   - amount: 6
+    id: egg
     name: eggs
     note: large
   - amount: 1
     unit: tbsp
+    id: dulce-de-leche
     name: dulce de leche
     note: heaping
   - amount: 225
     unit: g
+    id: white-sugar
     name: granulated sugar
     note: for the caramel, about 1 cup + 2 tbsp
   - amount: 150
     unit: ml
+    id: water
     name: hot water
     note: for the caramel, about ½ cup + 2 tbsp
 method:

@@ -5,45 +5,59 @@ prepTime: 20 min
 cookTime: 4 hr 30 min
 ingredients:
   - amount: 1
+    id: onion
     name: cebola
     note: grande, picada fininha
   - amount: 3
+    id: celery
     name: salsão
     note: talos, picados fininhos
   - amount: 3
+    id: carrot
     name: cenoura
     note: grandes, cortadas em rodelas e ao meio
-  - name: sal
+  - id: salt
+    name: sal
     note: a gosto
-  - name: pimenta
+  - id: black-pepper
+    name: pimenta
     note: a gosto
   - amount: 150
     unit: g
+    id: tomato-paste
     name: pasta de tomate
   - amount: 400
     unit: g
+    id: peeled-tomatoes
     name: tomate pelado
     note: enlatado
   - amount: 1
     unit: l
+    id: tomato-passata
     name: passata de tomate
-  - name: azeite de oliva
+  - id: olive-oil
+    name: azeite de oliva
     note: extra virgem, quantidade generosa
   - amount: 250
     unit: ml
+    id: red-wine
     name: vinho tinto
   - amount: 300
     unit: ml
+    id: milk
     name: leite
     note: cerca de 1 caneca
   - amount: 1000
     unit: g
+    id: ground-beef
     name: carne moída
   - amount: 1
     unit: l
+    id: water
     name: água quente
   - amount: 0.5
     unit: l
+    id: water
     name: água extra
     note: apenas se o molho secar
 method:

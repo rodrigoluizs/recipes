@@ -6,25 +6,31 @@ cookTime: 1 hr 50 min
 ingredients:
   - amount: 760
     unit: g
+    id: condensed-milk
     name: leite condensado
     note: 2 latas de 380 g
   - amount: 520
     unit: ml
+    id: whole-milk
     name: leite integral
     note: cerca de 1,5 lata, um dedo abaixo do cheio
   - amount: 6
+    id: egg
     name: ovos
     note: grandes
   - amount: 1
     unit: col. sopa
+    id: dulce-de-leche
     name: doce de leite
     note: cheia
   - amount: 225
     unit: g
+    id: white-sugar
     name: açúcar refinado
     note: para a calda, cerca de 1 xícara + 2 col. sopa
   - amount: 150
     unit: ml
+    id: water
     name: água quente
     note: para a calda, cerca de ½ xícara + 2 col. sopa
 method:

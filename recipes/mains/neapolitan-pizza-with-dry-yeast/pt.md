@@ -6,27 +6,36 @@ cookTime: 5-10 min por pizza
 ingredients:
   - amount: 600
     unit: ml
+    id: water
     name: água
     note: temperatura ambiente
   - amount: 1000
     unit: g
+    id: 00-pizza-flour
     name: farinha de pizza 00
     note: como a Le 5 Stagioni Pizza Napoletana
   - amount: 30
     unit: g
+    id: salt
     name: sal marinho fino
   - amount: 1
     unit: g
+    id: dry-yeast
     name: fermento seco
-  - name: sêmola
+  - id: semolina
+    name: sêmola
     note: refinada, para polvilhar
-  - name: molho de tomate
+  - id: tomato-sauce
+    name: molho de tomate
     note: por pizza
-  - name: mussarela
+  - id: mozzarella
+    name: mussarela
     note: fresca, fatiada
-  - name: manjericão
+  - id: basil
+    name: manjericão
     note: folhas frescas
-  - name: azeite de oliva
+  - id: olive-oil
+    name: azeite de oliva
     note: extravirgem, para regar
 method:
   - "Ative o fermento: coloque a [[água]] na tigela da batedeira, polvilhe o [[fermento seco]], mexa rapidamente e deixe dissolver por cerca de 1 minuto."

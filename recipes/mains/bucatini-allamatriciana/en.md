@@ -6,25 +6,32 @@ cookTime: 30 min
 ingredients:
   - amount: 250
     unit: g
+    id: bucatini
     name: bucatini
   - amount: 75
     unit: g
+    id: guanciale
     name: guanciale
     note: or pancetta, cut into cubes
   - amount: 400
     unit: g
+    id: peeled-tomatoes
     name: peeled tomatoes
     note: canned
   - amount: 5
     unit: l
+    id: water
     name: water
     note: for boiling the pasta
-  - name: salt
+  - id: salt
+    name: salt
     note: to taste
-  - name: pepper
+  - id: black-pepper
+    name: pepper
     note: to taste
   - amount: 1
     unit: cup
+    id: white-wine
     name: white wine
 method:
   - Cut the [[guanciale]] into cubes, keeping the fat attached.

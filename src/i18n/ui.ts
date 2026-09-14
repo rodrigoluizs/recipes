@@ -49,6 +49,18 @@ export interface UIStrings {
   chooseLanguage: string;
   durHr: string;
   durMin: string;
+  // Shopping list
+  shoppingList: string;
+  addToList: string;
+  addedToList: string;
+  cartAriaLabel: string;
+  shoppingListEmpty: string;
+  alreadyHaveHint: string;
+  clearChecked: string;
+  emptyListAction: string;
+  confirmEmptyList: string;
+  manualItemPlaceholder: string;
+  addItem: string;
 }
 
 export const ui: Record<Locale, UIStrings> = {
@@ -93,6 +105,18 @@ export const ui: Record<Locale, UIStrings> = {
     chooseLanguage: 'Choose language',
     durHr: 'hr',
     durMin: 'min',
+    shoppingList: 'Shopping list',
+    addToList: 'Add to list',
+    addedToList: 'Added',
+    cartAriaLabel: 'Shopping list',
+    shoppingListEmpty:
+      'Your shopping list is empty. Open a recipe and tap “Add to list”, or add an item below.',
+    alreadyHaveHint: 'Tap an item you already have to cross it off.',
+    clearChecked: 'Clear checked',
+    emptyListAction: 'Empty list',
+    confirmEmptyList: 'Empty the whole shopping list?',
+    manualItemPlaceholder: 'Add an item…',
+    addItem: 'Add',
   },
   pt: {
     siteName: 'Cozinha do Rodrigo',
@@ -135,6 +159,18 @@ export const ui: Record<Locale, UIStrings> = {
     chooseLanguage: 'Escolher idioma',
     durHr: 'h',
     durMin: 'min',
+    shoppingList: 'Lista de compras',
+    addToList: 'Adicionar à lista',
+    addedToList: 'Adicionado',
+    cartAriaLabel: 'Lista de compras',
+    shoppingListEmpty:
+      'Sua lista de compras está vazia. Abra uma receita e toque em “Adicionar à lista”, ou adicione um item abaixo.',
+    alreadyHaveHint: 'Toque em um item que você já tem para riscá-lo.',
+    clearChecked: 'Limpar marcados',
+    emptyListAction: 'Esvaziar lista',
+    confirmEmptyList: 'Esvaziar toda a lista de compras?',
+    manualItemPlaceholder: 'Adicionar um item…',
+    addItem: 'Adicionar',
   },
 };
 

@@ -6,19 +6,24 @@ cookTime: 45 min
 ingredients:
   - amount: 7
     unit: l
+    id: whole-milk
     name: pasteurized whole milk
     note: 3.8% fat
   - amount: 100
     unit: g
+    id: salt
     name: salt (milk)
   - amount: 2
     unit: ml
+    id: calcium-chloride
     name: calcium chloride
   - amount: 2
     unit: ml
+    id: liquid-rennet
     name: liquid rennet
   - amount: 80
     unit: g
+    id: salt
     name: salt (curd)
 method:
   - In a large pot, combine the [[pasteurized whole milk]] and the [[salt (milk)]].
