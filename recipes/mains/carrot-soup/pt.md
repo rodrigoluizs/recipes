@@ -4,26 +4,31 @@ servings: 10
 prepTime: 15 min
 cookTime: 1 hr 5 min
 ingredients:
-  - amount: 2
+  - amount: 300
+    unit: g
     id: carrot
     name: cenouras
-    note: grandes
-  - amount: 2
+    note: grandes (~2)
+  - amount: 300
+    unit: g
     id: potato
     name: batatas
-    note: médias
-  - amount: 1
+    note: médias (~2)
+  - amount: 150
+    unit: g
     id: onion
     name: cebola
-    note: média
-  - amount: 2
+    note: média (~1)
+  - amount: 240
+    unit: g
     id: tomato
     name: tomates
-    note: sem pele e sem sementes
-  - amount: 0.5
+    note: sem pele e sem sementes (~2)
+  - amount: 250
+    unit: g
     id: chicken-breast
     name: peito de frango
-    note: com osso e com pele
+    note: com osso e com pele (~½ peito)
   - id: parsley
     name: salsinha
     note: a gosto
