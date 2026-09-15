@@ -24,11 +24,11 @@ ingredients:
     id: tomato
     name: tomatoes
     note: peeled and deseeded (~2)
-  - amount: 250
+  - amount: 180
     unit: g
     id: chicken-breast
     name: chicken breast
-    note: bone-in, skin-on (~½ breast)
+    note: skinless, boneless
   - id: parsley
     name: parsley
     note: to taste
@@ -39,7 +39,7 @@ method:
   - In a pot, chop the [[carrots]], [[potatoes]], [[onion]] and [[tomatoes]].
   - Cut the [[chicken breast]] into 3 pieces and add them to the pot.
   - Cover with water and cook over low heat for 1 hour.
-  - Remove the chicken pieces, discarding the bones and skin.
+  - Remove the chicken pieces.
   - Shred one of the chicken pieces and set aside.
   - In a blender, blend the entire contents of the pot together with the 2 remaining whole chicken pieces.
   - Return the mixture to the pot and stir in the [[salt]], [[parsley]] and shredded chicken.
@@ -49,6 +49,6 @@ sourceUrl: https://www.tudogostoso.com.br/receita/77880-sopa-de-cenoura.html
 tags: [soup, chicken, vegetables]
 ---
 
-A comforting, blended carrot soup enriched with shredded chicken. The bone-in,
-skin-on chicken breast simmers with the vegetables to build flavour, then most
-of it is blended smooth while one piece is shredded back in for texture.
+A comforting, blended carrot soup enriched with shredded chicken. The chicken
+breast simmers with the vegetables to build flavour, then most of it is blended
+smooth while one piece is shredded back in for texture.

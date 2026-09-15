@@ -24,11 +24,11 @@ ingredients:
     id: tomato
     name: tomates
     note: sem pele e sem sementes (~2)
-  - amount: 250
+  - amount: 180
     unit: g
     id: chicken-breast
     name: peito de frango
-    note: com osso e com pele (~½ peito)
+    note: sem osso e sem pele
   - id: parsley
     name: salsinha
     note: a gosto
@@ -39,7 +39,7 @@ method:
   - Em uma panela, pique as [[cenouras]], as [[batatas]], a [[cebola]] e os [[tomates]].
   - Corte o [[peito de frango]] em 3 pedaços e adicione-os à panela.
   - Cubra com água e cozinhe em fogo baixo por 1 hora.
-  - Retire os pedaços de frango, descartando os ossos e a pele.
+  - Retire os pedaços de frango.
   - Desfie um dos pedaços de frango e reserve.
   - No liquidificador, bata todo o conteúdo da panela junto com os 2 pedaços de frango inteiros restantes.
   - Volte a mistura para a panela e incorpore o [[sal]], a [[salsinha]] e o frango desfiado.
@@ -50,6 +50,6 @@ tags: [sopa, frango, legumes]
 ---
 
 Uma sopa de cenoura reconfortante e batida, enriquecida com frango desfiado. O
-peito de frango com osso e pele cozinha com os legumes para construir sabor, e
-depois a maior parte é batida até ficar lisa, enquanto um pedaço é desfiado de
-volta para dar textura.
+peito de frango cozinha com os legumes para construir sabor, e depois a maior
+parte é batida até ficar lisa, enquanto um pedaço é desfiado de volta para dar
+textura.
