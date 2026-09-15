@@ -4,26 +4,31 @@ servings: 10
 prepTime: 15 min
 cookTime: 1 hr 5 min
 ingredients:
-  - amount: 2
+  - amount: 300
+    unit: g
     id: carrot
     name: carrots
-    note: large
-  - amount: 2
+    note: large (~2)
+  - amount: 300
+    unit: g
     id: potato
     name: potatoes
-    note: medium
-  - amount: 1
+    note: medium (~2)
+  - amount: 150
+    unit: g
     id: onion
     name: onion
-    note: medium
-  - amount: 2
+    note: medium (~1)
+  - amount: 240
+    unit: g
     id: tomato
     name: tomatoes
-    note: peeled and deseeded
-  - amount: 0.5
+    note: peeled and deseeded (~2)
+  - amount: 250
+    unit: g
     id: chicken-breast
     name: chicken breast
-    note: bone-in, skin-on
+    note: bone-in, skin-on (~½ breast)
   - id: parsley
     name: parsley
     note: to taste
