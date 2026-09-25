@@ -106,6 +106,9 @@ function init(page: PageData): void {
     saveList(addManualItem(loadList(), input.value));
     input.value = '';
     render();
+    // Keep focus so the mobile keyboard stays open for the next item — lets the
+    // user add several items in a row by just typing and pressing Enter.
+    input.focus();
   });
 
   document.querySelector('[data-clear-checked]')?.addEventListener('click', () => {
