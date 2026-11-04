@@ -47,6 +47,7 @@ export const INGREDIENTS = {
   milk: { en: 'milk', pt: 'leite' },
   'milk-chocolate': { en: 'milk chocolate', pt: 'chocolate ao leite' },
   mozzarella: { en: 'mozzarella', pt: 'mussarela' },
+  'oat-flour': { en: 'oat flour', pt: 'farinha de aveia' },
   oil: { en: 'oil', pt: 'óleo' },
   'olive-oil': { en: 'olive oil', pt: 'azeite de oliva' },
   onion: { en: 'onion', pt: 'cebola' },
