@@ -20,6 +20,7 @@ method:
   - Pipe or spoon small mounds onto a baking tray lined with parchment paper.
   - Bake in a low oven at 90–100°C for 1.5–2 hours — the goal is to dry them out, not brown them.
   - Turn off the oven and let them cool completely inside before removing.
+image: ./suspiro.jpg
 sourceUrl: https://www.tudogostoso.com.br/noticias/suspiro-perfeito-a4680.htm
 tags: [meringue, dessert, brazilian, egg-whites]
 ---
@@ -39,3 +40,8 @@ you don't use.
   foam.
 - Low and slow: they should dry out, not colour. Leaving them in the switched-off
   oven overnight makes them extra crisp.
+
+---
+
+*Photo: Marcin Floryan, [CC BY-SA 3.0](https://creativecommons.org/licenses/by-sa/3.0/), via
+[Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Home_made_meringues.jpg).*

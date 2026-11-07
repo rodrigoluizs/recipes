@@ -34,6 +34,7 @@ method:
   - Let the mixture rest for about 15 minutes so the coconut hydrates.
   - Pour into the pan, cover with foil and bake in a water bath (bain-marie) at 160–180°C for about 50–60 minutes, until set and golden on top.
   - Let it cool to just warm before unmolding.
+image: ./quindao.jpg
 sourceUrl: https://www.tudogostoso.com.br/receita/72737-quindao.html
 tags: [coconut, dessert, brazilian, egg-yolks]
 ---
@@ -52,3 +53,8 @@ coconutty.
 
 This recipe uses only the yolks — save the **10 egg whites** and turn them into
 [suspiro (meringue)](../suspiro/en.md).
+
+---
+
+*Photo: Tamorlan, [CC BY 3.0](https://creativecommons.org/licenses/by/3.0/), via
+[Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Quindim_-_San_Miguel-_2011.JPG).*

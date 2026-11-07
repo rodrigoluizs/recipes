@@ -34,6 +34,7 @@ method:
   - Deixe a mistura descansar cerca de 15 minutos para o coco hidratar.
   - Despeje na forma, cubra com papel-alumínio e asse em banho-maria a 160–180°C por cerca de 50–60 minutos, até firmar e dourar o topo.
   - Espere amornar antes de desenformar.
+image: ./quindao.jpg
 sourceUrl: https://www.tudogostoso.com.br/receita/72737-quindao.html
 tags: [coco, sobremesa, brasileiro, gemas]
 ---
@@ -53,3 +54,8 @@ brilhante e com muito sabor de coco.
 
 Esta receita usa só as gemas — guarde as **10 claras** e transforme em
 [suspiro](../suspiro/pt.md).
+
+---
+
+*Foto: Tamorlan, [CC BY 3.0](https://creativecommons.org/licenses/by/3.0/), via
+[Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Quindim_-_San_Miguel-_2011.JPG).*
