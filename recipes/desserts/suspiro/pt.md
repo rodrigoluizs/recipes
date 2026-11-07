@@ -20,6 +20,7 @@ method:
   - Com um saco de confeitar ou uma colher, faça pequenos montinhos numa assadeira forrada com papel-manteiga.
   - Asse em forno baixo, a 90–100°C, por 1h30 a 2h — a ideia é secar, não dourar.
   - Desligue o forno e deixe esfriar completamente lá dentro antes de retirar.
+image: ./suspiro.jpg
 sourceUrl: https://www.tudogostoso.com.br/noticias/suspiro-perfeito-a4680.htm
 tags: [merengue, sobremesa, brasileiro, claras]
 ---
@@ -39,3 +40,8 @@ que não usar.
   a espuma.
 - Forno baixo e devagar: os suspiros devem secar, não corar. Deixá-los no forno
   desligado de um dia para o outro deixa-os ainda mais crocantes.
+
+---
+
+*Foto: Marcin Floryan, [CC BY-SA 3.0](https://creativecommons.org/licenses/by-sa/3.0/), via
+[Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Home_made_meringues.jpg).*
